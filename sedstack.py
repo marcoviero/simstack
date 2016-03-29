@@ -42,41 +42,6 @@ def simultaneous_stack_sed_oned(p, layers_1d, data1d, wavelengths, LenLayers, ze
     return (data1d - model)
   return (data1d - model)/err1d
 
-def circle_mask(pixmap,radius_in,pixres):
-  ''' Makes a 2D circular image of zeros and ones'''
-
-  radius=radius_in/pixres
-  xy = np.shape(pixmap)
-  xx = xy[0]
-  yy = xy[1]
-  beforex = np.log2(xx)
-  beforey = np.log2(yy)
-  if beforex != beforey:
-    if beforex > beforey:
-      before = beforex 
-    else:
-      before = beforey
-  else: before = beforey
-  l2 = np.ceil(before)
-  pad_side = 2.0 ** l2
-  outmap = np.zeros([pad_side, pad_side])
-  outmap[:xx,:yy] = pixmap
-
-  dist_array = shift_twod(dist_idl(pad_side, pad_side), pad_side/2, pad_side/2)
-  circ = np.zeros([pad_side, pad_side])
-  ind_one = np.where(dist_array <= radius)
-  circ[ind_one] = 1.
-  mask  = np.real( np.fft.ifft2( np.fft.fft2(circ) *
-          np.fft.fft2(outmap)) 
-          ) * pad_side * pad_side
-  mask = np.round(mask)
-  ind_holes = np.where(mask >= 1.0)
-  mask = mask * 0.
-  mask[ind_holes] = 1.
-  maskout = shift_twod(mask, pad_side/2, pad_side/2)
-
-  return maskout[:xx,:yy]
-
 def stack_in_redshift_slices(
   cmaps, 
   hd, 
