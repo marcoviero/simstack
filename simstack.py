@@ -1,12 +1,13 @@
 import pdb
 import numpy as np
 from astropy.wcs import WCS
-from shift import shift_twod
-from VieroLibrary.dist_idl import dist_idl
+from utils import circle_mask
+from utils import dist_idl
+from utils import gauss_kern
+from utils import pad_and_smooth_psf
+from utils import shift_twod
+from utils import smooth_psf
 from lmfit import Parameters, minimize, fit_report
-from smoothmap import smooth_psf
-from smoothmap import pad_and_smooth_psf
-from gauss_kern import gauss_kern
 
 def simultaneous_stack_array_oned(p, layers_1d, data1d, err1d = None):
   ''' Function to Minimize written specifically for lmfit '''
@@ -40,41 +41,6 @@ def simultaneous_stack_array(p, layers_2d, data, err = None):
   if err is None:
     return (data - model)
   return (data - model)/err
-
-def circle_mask(pixmap,radius_in,pixres):
-  ''' Makes a 2D circular image of zeros and ones'''
-
-  radius=radius_in/pixres
-  xy = np.shape(pixmap)
-  xx = xy[0]
-  yy = xy[1]
-  beforex = np.log2(xx)
-  beforey = np.log2(yy)
-  if beforex != beforey:
-    if beforex > beforey:
-      before = beforex 
-    else:
-      before = beforey
-  else: before = beforey
-  l2 = np.ceil(before)
-  pad_side = 2.0 ** l2
-  outmap = np.zeros([pad_side, pad_side])
-  outmap[:xx,:yy] = pixmap
-
-  dist_array = shift_twod(dist_idl(pad_side, pad_side), pad_side/2, pad_side/2)
-  circ = np.zeros([pad_side, pad_side])
-  ind_one = np.where(dist_array <= radius)
-  circ[ind_one] = 1.
-  mask  = np.real( np.fft.ifft2( np.fft.fft2(circ) *
-          np.fft.fft2(outmap)) 
-          ) * pad_side * pad_side
-  mask = np.round(mask)
-  ind_holes = np.where(mask >= 1.0)
-  mask = mask * 0.
-  mask[ind_holes] = 1.
-  maskout = shift_twod(mask, pad_side/2, pad_side/2)
-
-  return maskout[:xx,:yy]
 
 def stack_in_redshift_slices(
   cmap, 

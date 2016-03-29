@@ -5,7 +5,7 @@ from utils import readcol
 from astropy.io import fits
 from simstack import stack_in_redshift_slices as simstack
 from sedstack import stack_in_redshift_slices as sedstack
-from VieroLibrary.invert_sed import single_simple_flux_from_greybody
+from invert_sed import single_simple_flux_from_greybody
 
 def viero_quick_stack(
 	map_names, 

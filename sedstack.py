@@ -2,15 +2,16 @@ import pdb
 import numpy as np
 import os
 from astropy.wcs import WCS
-from shift import shift_twod
-from VieroLibrary.dist_idl import dist_idl
-from VieroLibrary import readcol
-from zero_pad import zero_pad
-from lmfit import Parameters, minimize, fit_report
-from smoothmap import smooth_psf
-from smoothmap import pad_and_smooth_psf
-from gauss_kern import gauss_kern
 from invert_sed import single_simple_flux_from_greybody
+import readcol
+from utils import circle_mask
+from utils import dist_idl
+from utils import gauss_kern
+from utils import pad_and_smooth_psf
+from utils import shift_twod
+from utils import smooth_psf
+from utils import zero_pad
+from lmfit import Parameters, minimize, fit_report
 
 def simultaneous_stack_sed_oned(p, layers_1d, data1d, wavelengths, LenLayers, zed, err1d = None):
   ''' Function to Minimize written specifically for lmfit '''
