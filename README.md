@@ -2,7 +2,10 @@
 SIMSTACK for Python
 
 An open-source, Python version of SIMSTACK. 
-Hopefully, with community input will grow in utility.
+For those familiar with the IDL version, viero_quick_stack is a similar wrapper to the stack_in_redshift_slices function.  
+This python code is intended to be object oriented, with map objects (containing maps, noisemaps, beams, color corrections, etc.) and catalog objects (with RA/DEC lists for different selection criteria) collected into libraries, and SIMSTACK performed with one line of code.  
+
+Hopefully, with community input (which I encourage!) the code will grow in utility.
 
 ## People
 
