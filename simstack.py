@@ -147,7 +147,6 @@ def stack_in_redshift_slices(
 
   return cov_ss_1d
 
-
 def stack_libraries_in_redshift_slices(
   map_library, 
   subcatalog_library,
