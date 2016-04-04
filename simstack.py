@@ -20,7 +20,8 @@ def simultaneous_stack_array_oned(p, layers_1d, data1d, err1d = None):
   model = np.zeros(len_model)
 
   for i in range(nlayers):
-    model[:] += layers_1d[i*len_model:(i+1)*len_model] * v['layer'+str(i)] 
+    #model[:] += layers_1d[i*len_model:(i+1)*len_model] * v['layer'+str(i)] 
+    model[:] += layers_1d[i*len_model:(i+1)*len_model] * v[v.keys()[i]] 
 
   if err1d is None:
     return (data1d - model)
@@ -36,7 +37,8 @@ def simultaneous_stack_array(p, layers_2d, data, err = None):
   model = np.zeros(csize[1])
 
   for i in range(csize[0]):
-    model += layers_2d[i,:] * v['layer'+str(i)] 
+    #model += layers_2d[i,:] * v['layer'+str(i)] 
+    model += layers_2d[i,:] * v[v.keys()[i]]  
 
   if err is None:
     return (data - model)
@@ -159,6 +161,7 @@ def stack_libraries_in_redshift_slices(
   nlists = len(lists)
   stacked_sed=np.zeros([nwv, nlists])
   stacked_sed_err=np.zeros([nwv,nlists])
+  stacked_layers = {}
 
   #PUT DATA INTO CUBE
   nsources = 0 # initialize a counter  
@@ -242,10 +245,15 @@ def stack_libraries_in_redshift_slices(
 
     fit_params = Parameters()
     for iarg in range(nlists): 
-      fit_params.add('layer'+str(iarg),value= 1e-3*np.random.randn())
-      #arg = lists[iarg]
+      #fit_params.add('layer'+str(iarg),value= 1e-3*np.random.randn())
+      #fit_params.add('z_0.5-1.0__m_11.0-13.0_qt'+str(iarg),value= 1e-3*np.random.randn())
+      #fit_params.add(lists[iarg],value= 1e-3*np.random.randn())
+      arg = lists[iarg]
+      arg=arg.replace('.','p')
+      arg=arg.replace('-','_')
+      #print arg
       #arg = arg.translate(None, ''.join(['-','.']))
-      #fit_params.add(arg,value= 1e-3*np.random.randn())
+      fit_params.add(arg,value= 1e-3*np.random.randn())
     imap = cmap[ind_fit]
     ierr = cnoise[ind_fit]
 
@@ -254,6 +262,7 @@ def stack_libraries_in_redshift_slices(
 
     stacked_flux = np.array(cov_ss_1d.params.values())
     stacked_sed[iwv,:] = stacked_flux 
+    stacked_layers[str(cwv)] = cov_ss_1d.params
 
     #print  map_library.keys()[iwv]+' stack completed'
     #pdb.set_trace()
@@ -261,7 +270,8 @@ def stack_libraries_in_redshift_slices(
   ind_sorted = np.argsort(np.asarray(cwavelengths))
   new_stacked_sed = np.array([stacked_sed[i,:] for i in ind_sorted])
 
-  return new_stacked_sed
+  return stacked_layers
+  #return new_stacked_sed
 
 
 
