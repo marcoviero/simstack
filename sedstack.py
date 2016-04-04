@@ -30,7 +30,6 @@ def simultaneous_stack_sed_oned(p, layers_1d, data1d, wavelengths, LenLayers, ze
   cuLL = np.cumsum(LL)
   SuperChunk.extend(LenLayers * Nlayers)
   cuSuperChunk = np.cumsum(SuperChunk)
-  pdb.set_trace()
   for i in range(Nlayers):
     Temp = np.asarray(v['T'+str(i)])
     Lir = np.asarray(v['L'+str(i)])
@@ -348,6 +347,7 @@ def stack_libraries_in_redshift_slices(
   nwv = len(map_library.keys())
   lists = subcatalog_library.keys()
   nlists = len(lists)
+  stacked_layers = {}
 
   #PUT DATA INTO CUBE
   ##########REPLACE WITH LIBRARY
@@ -478,23 +478,26 @@ def stack_libraries_in_redshift_slices(
     arg = lists[iarg]
     arg=arg.replace('.','p')
     arg=arg.replace('-','_')
-    fit_params.add('T'+'_'+arg,value= tguess,vary=True,min=tguess - 10.0,max=tguess + 30.0)
-    fit_params.add('L'+'_'+arg,value= 1e12,min=1e5,max=1e14)
+    fit_params.add('T'+str(iarg),value= tguess,vary=True,min=tguess - 10.0,max=tguess + 30.0)
+    fit_params.add('L'+str(iarg),value= 1e12,min=1e5,max=1e14)
+    #fit_params.add('T'+'_'+arg,value= tguess,vary=True,min=tguess - 10.0,max=tguess + 30.0)
+    #fit_params.add('L'+'_'+arg,value= 1e12,min=1e5,max=1e14)
 
   cov_ss_1d = minimize(simultaneous_stack_sed_oned, fit_params, 
     args=(cfits_flat,), kws={'data1d':flat_maps,'err1d':flat_noise,'wavelengths':cwavelengths,'LenLayers':LenLayers,'zed':zed})
 
+  pdb.set_trace()
   v = cov_ss_1d.params.valuesdict()
 
   beta = np.asarray(v['b'])
   for ised in range(nlists):
-    arg = lists[ised]
-    arg=arg.replace('.','p')
-    arg=arg.replace('-','_')
-    Temp = np.asarray(v['T'+'_'+arg])
-    Lir = np.asarray(v['T'+'_'+arg])
-    #Temp = np.asarray(v['T'+str(ised)])
-    #Lir = np.asarray(v['L'+str(ised)])
+    #arg = lists[ised]
+    #arg=arg.replace('.','p')
+    #arg=arg.replace('-','_')
+    #Temp = np.asarray(v['T'+'_'+arg])
+    #Lir = np.asarray(v['T'+'_'+arg])
+    Temp = np.asarray(v['T'+str(ised)])
+    Lir = np.asarray(v['L'+str(ised)])
     #pdb.set_trace()
     stacked_sed[:,ised]=single_simple_flux_from_greybody(np.sort(np.asarray(cwavelengths)), Trf = Temp, Lrf = Lir, b=beta, zin=zed)
   #pdb.set_trace()
