@@ -155,7 +155,7 @@ def stack_libraries_in_redshift_slices(
   quiet=None):
   
   #FIRST DO LAYERS CUBE
-  n_sources_max=50000l
+  n_sources_max=500000l
   nwv = len(map_library.keys())
   lists = subcatalog_library.keys()
   nlists = len(lists)
@@ -173,7 +173,7 @@ def stack_libraries_in_redshift_slices(
       dec = subcatalog_library[subcatalog_key][1]
       nsources_list=len(ra)
       if nsources_list > n_sources_max: 
-        print 'too many sources in catalog: use N_SOURCES_MAX flag'
+        print str(nsources_list)+' is too many sources in catalog: use N_SOURCES_MAX flag'
         break
       if nsources_list > 0:
         layers_radec[0:nsources_list,i,0]=ra
@@ -280,7 +280,7 @@ def stack_multiple_fields_in_redshift_slices(
   subcatalog_library,
   quiet=None):
   
-  n_sources_max=50000l
+  n_sources_max=500000l
   ckeys = [i for i in map_library.keys()]
   cwavelengths = [map_library[i].wavelength for i in ckeys] 
   #indwv=np.argsort(cwavelengths)
@@ -304,7 +304,7 @@ def stack_multiple_fields_in_redshift_slices(
       dec = subcatalog_library[subcatalog_key][1]
       nsources_list=len(ra)
       if nsources_list > n_sources_max: 
-        print 'too many sources in catalog: use N_SOURCES_MAX flag'
+        print str(nsources_list)+' is too many sources in catalog: use N_SOURCES_MAX flag'
         break
       if nsources_list > 0:
         layers_radec[0:nsources_list,i,0]=ra
@@ -401,7 +401,7 @@ def stack_multiple_fields_in_redshift_slices(
 
     stacked_flux = np.array(cov_ss_1d.params.values())
     stacked_sed[jwv,:] = stacked_flux 
-    stacked_layers[uwavelengths[jwv]] = cov_ss_1d.params
+    stacked_layers[str(uwavelengths[jwv])] = cov_ss_1d.params
 
     #print  map_library.keys()[iwv]+' stack completed'
     #pdb.set_trace()
