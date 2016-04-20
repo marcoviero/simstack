@@ -38,10 +38,14 @@ def simultaneous_stack_multimap(p, layers_1d, data1d, err1d = None, nmaps = 1, l
 
   model = np.zeros(len(data1d))
   nlayers = len(layers_1d)/len(data1d)
-  if lmaps != None: 
-    imaps = np.cumsum([0] + lmaps)
-  else:
+  #if lmaps != None: 
+  #  imaps = np.cumsum([0] + lmaps)
+  #else:
+  #  imaps = [0]
+  if nmaps == 1: 
     imaps = [0]
+  else:
+    imaps = np.cumsum([0] + lmaps)
 
   for i in range(nmaps):
     i0 = imaps[i]*nlayers
