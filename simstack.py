@@ -34,7 +34,7 @@ def simultaneous_stack_array_oned(p, layers_1d, data1d, err1d = None, arg_order 
 def simultaneous_stack_multimap(p, layers_1d, data1d, err1d = None, nmaps = 1, lmaps = None, arg_order = None):
   ''' Function to Minimize written specifically for lmfit '''
 
-  v = p.valuesdict()
+  flux = p.valuesdict()
 
   model = np.zeros(len(data1d))
   nlayers = len(layers_1d)/len(data1d)
@@ -56,12 +56,12 @@ def simultaneous_stack_multimap(p, layers_1d, data1d, err1d = None, nmaps = 1, l
       len_model = lmaps[i] 
 
     for j in range(nlayers):
-      #print v.keys()[i] 
+      #print flux.keys()[i] 
       #pdb.set_trace()
       if arg_order != None:
-        model[imaps[i]:imaps[i+1]] += layers_1d[i0 + j*len_model:i0 + (j+1)*len_model] * v[arg_order[j]] 
+        model[imaps[i]:imaps[i+1]] += layers_1d[i0 + j*len_model:i0 + (j+1)*len_model] * flux[arg_order[j]] 
       else:
-        model[imaps[i]:imaps[i+1]] += layers_1d[i0 + j*len_model:i0 + (j+1)*len_model] * v[v.keys()[j]] 
+        model[imaps[i]:imaps[i+1]] += layers_1d[i0 + j*len_model:i0 + (j+1)*len_model] * flux[flux.keys()[j]] 
 
   if err1d is None:
     return (data1d - model)
@@ -70,15 +70,15 @@ def simultaneous_stack_multimap(p, layers_1d, data1d, err1d = None, nmaps = 1, l
 def simultaneous_stack_array(p, layers_2d, data, err = None):
   ''' Function to Minimize written specifically for lmfit '''
 
-  v = p.valuesdict()
+  flux = p.valuesdict()
 
   csize = np.shape(layers_2d)
 
   model = np.zeros(csize[1])
 
   for i in range(csize[0]):
-    #model += layers_2d[i,:] * v['layer'+str(i)] 
-    model += layers_2d[i,:] * v[v.keys()[i]]  
+    #model += layers_2d[i,:] * flux['layer'+str(i)] 
+    model += layers_2d[i,:] * flux[flux.keys()[i]]  
 
   if err is None:
     return (data - model)
