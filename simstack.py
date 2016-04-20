@@ -19,12 +19,13 @@ def simultaneous_stack_array_oned(p, layers_1d, data1d, err1d = None, arg_order 
 
   model = np.zeros(len_model)
 
-  #print 'again'
   for i in range(nlayers):
     #print v.keys()[i] 
     #print arg_order[i]
-    #model[:] += layers_1d[i*len_model:(i+1)*len_model] * v['layer'+str(i)] 
-    model[:] += layers_1d[i*len_model:(i+1)*len_model] * v[v.keys()[i]] 
+    if arg_order != None:
+      model[:] += layers_1d[i*len_model:(i+1)*len_model] * v[arg_order[i]] 
+    else:
+      model[:] += layers_1d[i*len_model:(i+1)*len_model] * v[v.keys()[i]] 
 
   if err1d is None:
     return (data1d - model)
@@ -53,7 +54,10 @@ def simultaneous_stack_multimap(p, layers_1d, data1d, err1d = None, nmaps = 1, l
     for j in range(nlayers):
       #print v.keys()[i] 
       #pdb.set_trace()
-      model[imaps[i]:imaps[i+1]] += layers_1d[i0 + j*len_model:i0 + (j+1)*len_model] * v[v.keys()[j]] 
+      if arg_order != None:
+        model[imaps[i]:imaps[i+1]] += layers_1d[i0 + j*len_model:i0 + (j+1)*len_model] * v[arg_order[j]] 
+      else:
+        model[imaps[i]:imaps[i+1]] += layers_1d[i0 + j*len_model:i0 + (j+1)*len_model] * v[v.keys()[j]] 
 
   if err1d is None:
     return (data1d - model)
