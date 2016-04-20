@@ -468,16 +468,6 @@ def stack_multiple_fields_in_redshift_slices(
   stacked_sed_err=np.zeros([nwv,nlists])
   stacked_layers = {}
 
-  #PUT DATA INTO CUBE
-
-  #layers_radec = {} # each entry [RA,DEC]
-  #for i in lists: 
-  #  if len(subcatalog_library[i][0]) > 0:
-  #    ra  = subcatalog_library[i][0]
-  #    dec = subcatalog_library[i][1]
-  #    if len(ra) > 0:
-  #      layers_radec[i] = [ra,dec]
-
   radius = 1.1
   for jwv in range(nwv): 
     argwv = np.where(cwavelengths == uwavelengths[jwv])[0]
@@ -500,16 +490,11 @@ def stack_multiple_fields_in_redshift_slices(
       cw = WCS(chd)
       cms = np.shape(cmap)
 
-      # STEP 1  - Make Layers Cube at each wavelength
+      # STEP 1  - Make Layers Cube for each map 
       layers=np.zeros([nlists,cms[0],cms[1]]) 
 
-      #for s in lists:
-      #print 'here'
       for k in range(nlists):
         s = lists[k]
-        #if s in layers_radec.keys():
-        #  ra = np.array(layers_radec[s][0])
-        #  dec = np.array(layers_radec[s][1])
         if len(subcatalog_library[s][0]) > 0: 
           ra = subcatalog_library[s][0]
           dec = subcatalog_library[s][1]
@@ -533,7 +518,6 @@ def stack_multiple_fields_in_redshift_slices(
       total_circles_mask = circle_mask(flattened_pixmap, radius * fwhm, pixsize)
       ind_fit = np.where(total_circles_mask >= 1) # & zeromask != 0)
       nhits = np.shape(ind_fit)[1]
-      #cfits_maps = np.zeros([nlists,nhits])
 
       #print 'there'
       for u in range(nlists):
@@ -541,9 +525,7 @@ def stack_multiple_fields_in_redshift_slices(
         layer = layers[u,:,:]  
         tmap = pad_and_smooth_psf(layer, kern)
         tmap[ind_fit] -= np.mean(tmap[ind_fit], dtype=np.float32)
-        #THIS IS WHERE THE PROBLEM IS I"M SURE OF IT
         cfits_flat = np.append(cfits_flat,np.ndarray.flatten(tmap[ind_fit]))
-        #cfits_maps[u,:] = tmap[ind_fit]
 
       #print str(cwv)+' cube smoothed'
 
@@ -568,9 +550,6 @@ def stack_multiple_fields_in_redshift_slices(
 
     #pdb.set_trace()
     print 'cfits_flat length: ' + str(len(cfits_flat))
-    #cov_ss_1d = minimize(simultaneous_stack_array_oned, fit_params, 
-      #args=(cfits_flat,), kws={'data1d':imap,'err1d':ierr,'arg_order':arg_order})
-      ##args=(np.ndarray.flatten(cfits_maps),), kws={'data1d':np.ndarray.flatten(imap),'err1d':np.ndarray.flatten(ierr)})
     cov_ss_1d = minimize(simultaneous_stack_multimap, fit_params, 
       args=(cfits_flat,), kws={'data1d':imap,'err1d':ierr,'nmaps':ninstances, 'lmaps':lmaps})
 
