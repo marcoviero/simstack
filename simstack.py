@@ -43,7 +43,7 @@ def simultaneous_stack_multimap(p, layers_1d, data1d, err1d = None, nmaps = 1, l
   #else:
   #  imaps = [0]
   if nmaps == 1: 
-    imaps = [0]
+    imaps = [0,len(layers_1d)*nlayers]
   else:
     imaps = np.cumsum([0] + lmaps)
 
@@ -275,7 +275,8 @@ def stack_libraries_in_redshift_slices(
     #pdb.set_trace()
     for u in range(nlists):
       layer = layers[u,:,:]  
-      tmap = pad_and_smooth_psf(layer, kern)
+      #tmap = pad_and_smooth_psf(layer, kern)
+      tmap = smooth_psf(layer, kern)
       tmap[ind_fit] -= np.mean(tmap[ind_fit])
       cfits_flat = np.append(cfits_flat,np.ndarray.flatten(tmap[ind_fit]))
       cfits_maps[u,:] = tmap[ind_fit]
@@ -531,7 +532,8 @@ def stack_multiple_fields_in_redshift_slices(
       for u in range(nlists):
         #print lists[u]
         layer = layers[u,:,:]  
-        tmap = pad_and_smooth_psf(layer, kern)
+        #tmap = pad_and_smooth_psf(layer, kern)
+        tmap = smooth_psf(layer, kern)
         tmap[ind_fit] -= np.mean(tmap[ind_fit], dtype=np.float32)
         cfits_flat = np.append(cfits_flat,np.ndarray.flatten(tmap[ind_fit]))
 
