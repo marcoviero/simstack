@@ -486,7 +486,7 @@ def stack_libraries_in_redshift_slices(
   cov_ss_1d = minimize(simultaneous_stack_sed_oned, fit_params, 
     args=(cfits_flat,), kws={'data1d':flat_maps,'err1d':flat_noise,'wavelengths':cwavelengths,'LenLayers':LenLayers,'zed':zed})
 
-  pdb.set_trace()
+  #pdb.set_trace()
   v = cov_ss_1d.params.valuesdict()
 
   beta = np.asarray(v['b'])
