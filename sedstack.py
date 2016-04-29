@@ -7,13 +7,14 @@ import readcol
 from utils import circle_mask
 from utils import dist_idl
 from utils import gauss_kern
+from utils import smooth_psf
 from utils import pad_and_smooth_psf
 from utils import shift_twod
 from utils import smooth_psf
 from utils import zero_pad
 from lmfit import Parameters, minimize, fit_report
 
-def simultaneous_stack_sed_oned(p, layers_1d, data1d, wavelengths, LenLayers, zed, err1d = None):
+def simultaneous_stack_sed_oned(p, layers_1d, data1d, wavelengths, LenLayers, zed, err1d = None, arg_keys = None):
   ''' Function to Minimize written specifically for lmfit '''
 
   v = p.valuesdict()
@@ -31,8 +32,13 @@ def simultaneous_stack_sed_oned(p, layers_1d, data1d, wavelengths, LenLayers, ze
   SuperChunk.extend(LenLayers * Nlayers)
   cuSuperChunk = np.cumsum(SuperChunk)
   for i in range(Nlayers):
-    Temp = np.asarray(v['T'+str(i)])
-    Lir = np.asarray(v['L'+str(i)])
+    if arg_keys == None:
+      Temp = np.asarray(v['T'+str(i)])
+      Lir = np.asarray(v['L'+str(i)])
+    else:
+      arg = arg_keys[i]
+      Temp = np.asarray(v['T'+'_'+arg])
+      Lir = np.asarray(v['L'+'_'+arg])
 
     fluxes = single_simple_flux_from_greybody(np.asarray(wavelengths), Trf = Temp, Lrf = Lir, b=2, zin=zed)
     for iwv in range(nwv):
@@ -200,17 +206,11 @@ def stack_objects_in_redshift_slices(
     #READ MAPS
     tmaps = map_library[map_library.keys()[wv]].map
     tnoise = map_library[map_library.keys()[wv]].noise
-    #if beam_area != None:
-    #  tmaps*=tmaps*beam_area[iwv]*1e6
-    #  tnoise*=toise*beam_area[iwv]*1e6
     twv = map_library[map_library.keys()[wv]].wavelength
     hd = map_library[map_library.keys()[wv]].header
     pixsize = map_library[map_library.keys()[wv]].pixel_size
     kern = map_library[map_library.keys()[wv]].psf
     fwhm = map_library[map_library.keys()[wv]].fwhm
-    #color_correction = map_library[map_library.keys()[wv]].color_correction
-    #tmaps *= color_correction[wv]
-    #tnoise *= color_correction[wv]
     cmaps.append(tmaps)
     cnoise.append(tnoise)
     cwavelengths.append(twv)
@@ -335,13 +335,13 @@ def stack_objects_in_redshift_slices(
   #pdb.set_trace()
   return [stacked_sed, v]
 
-
 def stack_libraries_in_redshift_slices(
   map_library, 
   subcatalog_library,
   zed=0.01,
   quiet=None):
 
+  print 'UPGRADE TO stack_libraries_in_redshift_slices_v2 !!!'
   #FIRST DO LAYERS CUBE
   n_sources_max=50000l
   nwv = len(map_library.keys())
@@ -502,3 +502,163 @@ def stack_libraries_in_redshift_slices(
     stacked_sed[:,ised]=single_simple_flux_from_greybody(np.sort(np.asarray(cwavelengths)), Trf = Temp, Lrf = Lir, b=beta, zin=zed)
   #pdb.set_trace()
   return [stacked_sed, v]
+
+def stack_libraries_in_redshift_slices_v2(
+  map_library, 
+  subcatalog_library,
+  zed=0.01,
+  quiet=None):
+
+  map_names = [i for i in map_library.keys()]
+  # All wavelengths in cwavelengths
+  cwavelengths = [map_library[i].wavelength for i in map_names] 
+  # Unique wavelengths in uwavelengths
+  uwavelengths = np.sort(np.unique(cwavelengths))
+  # nwv the number of unique wavelengths
+  nwv = len(uwavelengths)
+
+  lists = subcatalog_library.keys()
+  clean_args = [arg.replace('.','p').replace('-','_') for arg in lists]
+  #print clean_args
+  #pdb.set_trace()
+  nlists = len(lists)
+  stacked_sed=np.zeros([nwv, nlists])
+  stacked_sed_err=np.zeros([nwv,nlists])
+  stacked_layers = {}
+
+  ## 
+  cmaps = [] 
+  cnoise = [] 
+  cwavelengths = []
+  cw = []
+  cpix = []
+  cms = []
+  ckern = []
+  cfwhm = []
+  for wv in range(nwv): 
+    print map_library.keys()[wv]
+    #READ MAPS
+    tmaps = map_library[map_library.keys()[wv]].map
+    tnoise = map_library[map_library.keys()[wv]].noise
+    twv = map_library[map_library.keys()[wv]].wavelength
+    hd = map_library[map_library.keys()[wv]].header
+    pixsize = map_library[map_library.keys()[wv]].pixel_size
+    kern = map_library[map_library.keys()[wv]].psf
+    fwhm = map_library[map_library.keys()[wv]].fwhm
+    cmaps.append(tmaps)
+    cnoise.append(tnoise)
+    cwavelengths.append(twv)
+    cw.append(WCS(hd))
+    cpix.append(pixsize)
+    cms.append(np.shape(tmaps))
+    ckern.append(kern)
+    cfwhm.append(fwhm)
+  
+  #FIND SIZES OF MAP AND LISTS
+  #nwv = len(cwavelengths)  
+
+  cfits_flat = np.asarray([])
+  flat_maps= np.asarray([])
+  flat_noise= np.asarray([])
+  LenLayers= np.zeros([nwv])
+
+  radius = 1.1
+  for iwv in range(nwv):
+    # STEP 1  - Make Layers Cube at each wavelength
+    layers=np.zeros([nlists,cms[iwv][0],cms[iwv][1]])
+
+    x0 = 1e6
+    x1 = 0
+    y0 = 1e6
+    y1 = 0
+
+    for k in range(nlists):
+      s = lists[k]
+      if len(subcatalog_library[s][0]) > 0: 
+        ra = subcatalog_library[s][0]
+        dec = subcatalog_library[s][1]  
+        ty,tx = cw[iwv].wcs_world2pix(ra, dec, 0) 
+        # CHECK FOR SOURCES THAT FALL OUTSIDE MAP
+        ind_keep = np.where((np.round(tx) >= 0) & (np.round(tx) < cms[iwv][0]) & (np.round(ty) >= 0) & (np.round(ty) < cms[iwv][1]))
+        real_x=np.round(tx[ind_keep]).astype(int)
+        real_y=np.round(ty[ind_keep]).astype(int)
+        # CHECK FOR SOURCES THAT FALL ON ZEROS 
+        ind_nz=np.where(cmaps[iwv][real_x,real_y] != 0 )
+        nt = np.shape(ind_nz)[1]
+        #print 'ngals: ' + str(nt)
+        if nt > 0:
+          real_x = real_x[ind_nz]
+          real_y = real_y[ind_nz]
+          if np.min(real_x) < x0: x0 = np.min(real_x) 
+          if np.max(real_x) > x1: x1 = np.max(real_x) 
+          if np.min(real_y) < y0: y0 = np.min(real_y) 
+          if np.max(real_y) > y1: y1 = np.max(real_y) 
+          
+          for ni in range(nt):
+            layers[k, real_x[ni],real_y[ni]]+=1.0
+    # STEP 1b  - Crop maps and layers before convolving
+    #print x0, x1, y0, y1
+    #bpad = np.ceil(radius * cfwhm[iwv] /pixsize)
+    #layers = layers[:,x0-bpad:x1+bpad,y0-bpad:y1+bpad]
+    #layers2 = layers[:,x0-bpad:x1+bpad,y0-bpad:y1+bpad]
+
+    # STEP 2  - Convolve Layers and put in pixels
+    flattened_pixmap = np.sum(layers,axis=0)
+    total_circles_mask = circle_mask(flattened_pixmap, radius * cfwhm[iwv], cpix[iwv])
+    ind_fit = np.where(total_circles_mask >= 1) # & zeromask != 0)
+    nhits = np.shape(ind_fit)[1]
+    LenLayers[iwv] = nhits
+
+    for u in range(nlists):
+      layer = layers[u,:,:]  
+      #tmap = pad_and_smooth_psf(layer, ckern[iwv])
+      tmap = smooth_psf(layer, ckern[iwv])
+      tmap[ind_fit] -= np.mean(tmap[ind_fit])
+      cfits_flat = np.append(cfits_flat,np.ndarray.flatten(tmap[ind_fit]))
+
+    print str(cwavelengths[iwv])+' cube smoothed'
+
+    #pdb.set_trace()
+    lmap = cmaps[iwv]#[x0-bpad:x1+bpad,y0-bpad:y1+bpad]
+    lnoise = cnoise[iwv]#[x0-bpad:x1+bpad,y0-bpad:y1+bpad]
+    lmap[ind_fit] -= np.mean(lmap[ind_fit], dtype=np.float32)
+    flat_maps = np.append(flat_maps,np.ndarray.flatten(lmap[ind_fit]))
+    flat_noise = np.append(flat_noise,np.ndarray.flatten(lnoise[ind_fit]))
+    #pdb.set_trace()
+
+  # STEP 3 - Regress Layers with Map (i.e., stack!)
+
+  tguess = 27.0*((1.+zed)/(1.+1.))**(0.4)
+  fit_params = Parameters()
+  fit_params.add('b',value= 2.0,vary=False)
+  for iarg in range(nlists): 
+    arg = clean_args[iarg] #lists[iarg]
+    #arg=arg.replace('.','p')
+    #arg=arg.replace('-','_')
+    #fit_params.add('T'+str(iarg),value= tguess,vary=True,min=tguess - 10.0,max=tguess + 30.0)
+    #fit_params.add('L'+str(iarg),value= 1e12,min=1e5,max=1e14)
+    fit_params.add('T'+'_'+arg,value= tguess,vary=True,min=tguess - 10.0,max=tguess + 30.0)
+    fit_params.add('L'+'_'+arg,value= 1e12,min=1e5,max=1e14)
+
+  cov_ss_1d = minimize(simultaneous_stack_sed_oned, fit_params, 
+    args=(cfits_flat,), kws={'data1d':flat_maps,'err1d':flat_noise,'wavelengths':cwavelengths,'LenLayers':LenLayers,'zed':zed,'arg_keys':clean_args})
+
+  #pdb.set_trace()
+  v = cov_ss_1d.params.valuesdict()
+
+  beta = np.asarray(v['b'])
+  for ised in range(nlists):
+    #arg = lists[ised]
+    #arg=arg.replace('.','p')
+    #arg=arg.replace('-','_')
+    arg = clean_args[ised]
+    Temp = np.asarray(v['T'+'_'+arg])
+    Lir = np.asarray(v['T'+'_'+arg])
+    #Temp = np.asarray(v['T'+str(ised)])
+    #Lir = np.asarray(v['L'+str(ised)])
+    #pdb.set_trace()
+    #stacked_sed[:,ised]=single_simple_flux_from_greybody(np.sort(np.asarray(cwavelengths)), Trf = Temp, Lrf = Lir, b=beta, zin=zed)
+    stacked_layers[arg]=single_simple_flux_from_greybody(np.sort(np.asarray(cwavelengths)), Trf = Temp, Lrf = Lir, b=beta, zin=zed)
+  #pdb.set_trace()
+  #return [stacked_sed, v]
+  return [stacked_layers, v]
