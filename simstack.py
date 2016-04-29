@@ -189,7 +189,8 @@ def stack_in_redshift_slices(
 
   return cov_ss_1d
 
-def stack_libraries_in_redshift_slices(
+def stack_libraries_in_redshift_slices_old(
+
   map_library, 
   subcatalog_library,
   quiet=None):
@@ -303,6 +304,120 @@ def stack_libraries_in_redshift_slices(
 
     cov_ss_1d = minimize(simultaneous_stack_array_oned, fit_params, 
       args=(np.ndarray.flatten(cfits_maps),), kws={'data1d':np.ndarray.flatten(imap),'err1d':np.ndarray.flatten(ierr)})
+
+    stacked_flux = np.array(cov_ss_1d.params.values())
+    stacked_sed[iwv,:] = stacked_flux 
+    stacked_layers[str(cwv)] = cov_ss_1d.params
+
+    #print  map_library.keys()[iwv]+' stack completed'
+    #pdb.set_trace()
+
+  ind_sorted = np.argsort(np.asarray(cwavelengths))
+  new_stacked_sed = np.array([stacked_sed[i,:] for i in ind_sorted])
+
+  return stacked_layers
+  #return new_stacked_sed
+def stack_libraries_in_redshift_slices(
+  map_library, 
+  subcatalog_library,
+  quiet=None):
+  
+  map_names = [i for i in map_library.keys()]
+  # All wavelengths in cwavelengths
+  cwavelengths = [map_library[i].wavelength for i in map_names] 
+  # Unique wavelengths in uwavelengths
+  uwavelengths = np.sort(np.unique(cwavelengths))
+  # nwv the number of unique wavelengths
+  nwv = len(uwavelengths)
+
+  lists = subcatalog_library.keys()
+  nlists = len(lists)
+  stacked_sed=np.zeros([nwv, nlists])
+  stacked_sed_err=np.zeros([nwv,nlists])
+  stacked_layers = {}
+
+  cwavelengths = []
+  radius = 1.1
+  for iwv in range(nwv): 
+    print 'stacking '+map_library.keys()[iwv]
+    #READ MAPS
+    cmap = map_library[map_library.keys()[iwv]].map
+    cnoise = map_library[map_library.keys()[iwv]].noise
+    cwv = map_library[map_library.keys()[iwv]].wavelength
+    cwavelengths.append(cwv)
+    chd = map_library[map_library.keys()[iwv]].header
+    pixsize = map_library[map_library.keys()[iwv]].pixel_size
+    kern = map_library[map_library.keys()[iwv]].psf
+    fwhm = map_library[map_library.keys()[iwv]].fwhm
+    cw = WCS(chd)
+    cms = np.shape(cmap)
+
+    # STEP 1  - Make Layers Cube at each wavelength
+    layers=np.zeros([nlists,cms[0],cms[1]]) 
+
+    for k in range(nlists):
+      s = lists[k]
+      if len(subcatalog_library[s][0]) > 0: 
+        ra = subcatalog_library[s][0]
+        dec = subcatalog_library[s][1]  
+        ty,tx = cw.wcs_world2pix(ra, dec, 0) 
+        # CHECK FOR SOURCES THAT FALL OUTSIDE MAP
+        ind_keep = np.where((np.round(tx) >= 0) & (np.round(tx) < cms[0]) & (np.round(ty) >= 0) & (np.round(ty) < cms[1]))
+        real_x=np.round(tx[ind_keep]).astype(int)
+        real_y=np.round(ty[ind_keep]).astype(int)
+        # CHECK FOR SOURCES THAT FALL ON ZEROS 
+        ind_nz=np.where(cmap[real_x,real_y] != 0 )
+        nt = np.shape(ind_nz)[1]
+        #print 'ngals: ' + str(nt)
+        if nt > 0:
+          real_x = real_x[ind_nz]
+          real_y = real_y[ind_nz]
+          
+          for ni in range(nt):
+            layers[k, real_x[ni],real_y[ni]]+=1.0
+
+    # STEP 2  - Convolve Layers and put in pixels
+    flattened_pixmap = np.sum(layers,axis=0)
+    total_circles_mask = circle_mask(flattened_pixmap, radius * fwhm, pixsize)
+    ind_fit = np.where(total_circles_mask >= 1) # & zeromask != 0)
+    nhits = np.shape(ind_fit)[1]
+    ###
+    #cfits_maps = np.zeros([nlists,nhits])
+    cfits_flat = np.asarray([])
+    ###
+
+    #print cms
+    #pdb.set_trace()
+    for u in range(nlists):
+      layer = layers[u,:,:]  
+      #tmap = pad_and_smooth_psf(layer, kern)
+      tmap = smooth_psf(layer, kern)
+      tmap[ind_fit] -= np.mean(tmap[ind_fit])
+      cfits_flat = np.append(cfits_flat,np.ndarray.flatten(tmap[ind_fit]))
+      #cfits_maps[u,:] = tmap[ind_fit]
+
+    #print str(cwv)+' cube smoothed'
+
+    cmap[ind_fit] -= np.mean(cmap[ind_fit], dtype=np.float32)
+    #flat_map = np.ndarray.flatten(cmap[ind_fit]) 
+    #flat_noise = np.ndarray.flatten(cnoise[ind_fit]) 
+    imap = np.ndarray.flatten(cmap[ind_fit]) 
+    ierr = np.ndarray.flatten(cnoise[ind_fit]) 
+
+    fit_params = Parameters()
+    for iarg in range(nlists): 
+      #fit_params.add('layer'+str(iarg),value= 1e-3*np.random.randn())
+      #fit_params.add('z_0.5-1.0__m_11.0-13.0_qt'+str(iarg),value= 1e-3*np.random.randn())
+      #fit_params.add(lists[iarg],value= 1e-3*np.random.randn())
+      arg = lists[iarg]
+      arg=arg.replace('.','p')
+      arg=arg.replace('-','_')
+      #print arg
+      #arg = arg.translate(None, ''.join(['-','.']))
+      fit_params.add(arg,value= 1e-3*np.random.randn())
+
+    cov_ss_1d = minimize(simultaneous_stack_array_oned, fit_params, 
+      args=(cfits_flat,), kws={'data1d':imap,'err1d':ierr})
 
     stacked_flux = np.array(cov_ss_1d.params.values())
     stacked_sed[iwv,:] = stacked_flux 
@@ -507,6 +622,7 @@ def stack_multiple_fields_in_redshift_slices(
         if len(subcatalog_library[s][0]) > 0: 
           ra = subcatalog_library[s][0]
           dec = subcatalog_library[s][1]
+          #
           ty,tx = cw.wcs_world2pix(ra, dec, 0) 
           # CHECK FOR SOURCES THAT FALL OUTSIDE MAP
           ind_keep = np.where((np.round(tx) >= 0) & (np.round(tx) < cms[0]) & (np.round(ty) >= 0) & (np.round(ty) < cms[1]))
