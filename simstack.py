@@ -19,6 +19,7 @@ def simultaneous_stack_array_oned(p, layers_1d, data1d, err1d = None, arg_order 
 
   model = np.zeros(len_model)
 
+
   for i in range(nlayers):
     #print v.keys()[i] 
     #print arg_order[i]
