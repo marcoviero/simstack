@@ -1,7 +1,7 @@
 import pdb
 import numpy as np
 import os
-from utils import readcol
+from Utils import readcol
 from astropy.io import fits
 from simstack import stack_in_redshift_slices as simstack
 from sedstack import stack_in_redshift_slices as sedstack

@@ -19,7 +19,6 @@ def simultaneous_stack_array_oned(p, layers_1d, data1d, err1d = None, arg_order 
 
   model = np.zeros(len_model)
 
-
   for i in range(nlayers):
     #print v.keys()[i] 
     #print arg_order[i]
@@ -291,6 +290,7 @@ def stack_libraries_in_redshift_slices_old(
 
     fit_params = Parameters()
     for iarg in range(nlists): 
+
       #fit_params.add('layer'+str(iarg),value= 1e-3*np.random.randn())
       #fit_params.add('z_0.5-1.0__m_11.0-13.0_qt'+str(iarg),value= 1e-3*np.random.randn())
       #fit_params.add(lists[iarg],value= 1e-3*np.random.randn())
