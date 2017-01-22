@@ -801,7 +801,6 @@ def stack_multiple_fields_in_redshift_slices(
     stacked_layers[str(uwavelengths[jwv])] = cov_ss_1d.params
 
     #print  map_library.keys()[iwv]+' stack completed'
-    #pdb.set_trace()
 
   ind_sorted = np.argsort(np.asarray(uwavelengths))
   new_stacked_sed = np.array([stacked_sed[i,:] for i in ind_sorted])
