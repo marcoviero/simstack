@@ -322,7 +322,6 @@ def stack_libraries_in_redshift_slices(
   map_library, 
   subcatalog_library,
   quiet=None):
-  #just testing
   
   map_names = [i for i in map_library.keys()]
   # All wavelengths in cwavelengths
