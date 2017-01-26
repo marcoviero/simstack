@@ -1,0 +1,3 @@
+#!/bin/bash
+
+../simstack_from_pfile.py example.cfg
