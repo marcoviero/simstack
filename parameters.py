@@ -41,17 +41,17 @@ def get_params(param_file_path):
     params = get_general_params(raw_params) # Convert "raw" config dictionary to "organized" dictionary `params`
     params['io'] = get_io_parameters(raw_io_params)
     params['cosmo'] = get_cosmology_parameters(raw_cosmo_params)
-    params['maps'] = get_maps_parameters(raw_maps_to_stack_params,raw_map_path_params,raw_map_file_params)
-    params['noise'] = get_maps_parameters(raw_maps_to_stack_params,raw_noise_path_params,raw_noise_file_params)
-    #params['psfs'] = get_beams_parameters(raw_maps_to_stack_params,raw_beams_params)
+    params['map_files'] = get_maps_parameters(raw_maps_to_stack_params,raw_map_path_params,raw_map_file_params)
+    params['noise_files'] = get_maps_parameters(raw_maps_to_stack_params,raw_noise_path_params,raw_noise_file_params)
+    params['psfs'] = get_beams_parameters(raw_maps_to_stack_params,raw_beams_params)
     #params['cats'] = get_catalogs_parameters(raw_catalogs_params)
     #params['bins'] = get_binning_parameters(raw_binning_params)
 
-    pdb.set_trace()
     logging.info("---------- PARAMETER VALUES ----------")
     logging.info("======================================")
     logging.info("\n" + pprint.pformat(params, indent=4) + "\n")
 
+    pdb.set_trace()
     return params
 
 def get_general_params(raw_params):
@@ -71,7 +71,7 @@ def get_general_params(raw_params):
     
     # Number of bootstraps
     if params['bootstrap'] == True:
-        params['boots'] = raw_params['boots']
+        params['boots'] = float(raw_params['boots'])
 
     # If running bootstrap
     try:
@@ -118,8 +118,6 @@ def get_cosmology_parameters(raw_params):
     H0          = hubble_h0*100.
     cosmo       = ac.LambdaCDM(H0=H0, Om0=omega_m0, Ode0=omega_l0)
 
-    cosmo = {}
-
     return cosmo
 
 def get_maps_parameters(raw_maps_to_stack_params,raw_map_path_params,raw_map_file_params):
@@ -127,23 +125,21 @@ def get_maps_parameters(raw_maps_to_stack_params,raw_map_path_params,raw_map_fil
 
     for imap in raw_maps_to_stack_params:
         if bool(raw_maps_to_stack_params[imap].split()[1]) == True:
-            maps[imap+'_file'] = raw_map_path_params[imap] + raw_map_file_params[imap] 
+            maps[imap+''] = raw_map_path_params[imap] + raw_map_file_params[imap] 
 
     return maps
 
-def get_noise_parameters(raw_maps_to_stack_params,raw_noise_path_params,raw_noise_file_params):
-    noise = {}
+def get_beams_parameters(raw_maps_to_stack_params,raw_beams_params):
+    psfs = {}
 
     for imap in raw_maps_to_stack_params:
         if bool(raw_maps_to_stack_params[imap].split()[1]) == True:
-            noise[imap+'_file'] = raw_noise_path_params[imap] + raw_noise_file_params[imap] 
+            if is_float(raw_beams_params[imap]) == True:
+                psfs[imap+'_fwhm'] = float(raw_beams_params[imap])
+            else:
+                psfs[imap+'_beam_file'] = raw_beams_params[imap] 
 
-    return noise
-
-
-def get_beams_parameters(raw_beams_params):
-    psfs = {}
-
+            pdb.set_trace()
     return psfs
 
 def get_color_correction_parameters(raw_color_correction_params):
@@ -156,6 +152,12 @@ def get_color_catalog_parameters(raw_catalog_params):
 
     return catalog
 
+def is_float(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 def is_true(raw_params, key):
     """Is raw_params[key] true? Returns boolean value.
