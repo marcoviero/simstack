@@ -4,6 +4,7 @@ import os
 import logging
 import pprint
 import astropy.cosmology as ac
+from utils import string_is_true
 #from astropy.cosmology import Planck15 as cosmo
 
 def get_params(param_file_path):
@@ -39,7 +40,8 @@ def get_params(param_file_path):
 
     raw_io_params['param_file_path'] = os.path.abspath(param_file_path) # Store parameter file path
 
-    params = get_general_params(raw_params) # Convert "raw" config dictionary to "organized" dictionary `params`
+    # Convert "raw" config dictionary to "organized" dictionary `params`
+    params = get_general_params(raw_params) 
     params['io'] = get_io_parameters(raw_io_params)
     params['cosmo'] = get_cosmology_parameters(raw_cosmo_params)
     params['map_files'] = get_maps_parameters(raw_maps_to_stack_params,raw_map_path_params,raw_map_file_params)
@@ -68,19 +70,21 @@ def get_general_params(raw_params):
         params['galaxy_splitting_scheme'] = 'sf-qt'
 
     # If running bootstrap
-    if bool(raw_params['bootstrap'].split()[0]) == True:
+    if string_is_true(raw_params['bootstrap'].split()[0]) == True:
         params['bootstrap'] = True
         params['boot0'] = float(raw_params['bootstrap'].split()[1])
         params['number_of_boots'] = float(raw_params['bootstrap'].split()[2])
     else:
         params['bootstrap'] = False
+        params['boot0'] = 0 
+        params['number_of_boots'] = 1 
    
     return params
 def get_wavelength_parameters(raw_maps_to_stack_params):
     wavelengths = {}
 
     for imap in raw_maps_to_stack_params:
-        if bool(raw_maps_to_stack_params[imap].split()[1]) == True:
+        if string_is_true(raw_maps_to_stack_params[imap].split()[1]) == True:
             wavelengths[imap] = float(raw_maps_to_stack_params[imap].split()[0])
 
     return wavelengths
@@ -131,15 +135,21 @@ def get_binning_parameters(raw_params):
 def get_io_parameters(raw_params):
     io = {}
 
+    io['param_file_path']            = raw_params['param_file_path']
+    try:
+        io['shortname']              = raw_params['shortname']
+    except KeyError:
+        io['shortname']              = ''
     io['output_folder']              = raw_params['output_folder']
     try:
         io['output_bootstrap_folder']= raw_params['output_bootstrap_folder']
     except KeyError:
         io['output_bootstrap_folder']= raw_params['output_folder']
-
     io['flux_densities_filename']    = raw_params['flux_densities_filename']
-    io['boot_fluxes_filename']       = raw_params['boot_fluxes_filename']
-    io['param_file_path']            = raw_params['param_file_path']
+    try:
+        io['boot_fluxes_filename']   = raw_params['boot_fluxes_filename']
+    except KeyError:
+        io['boot_fluxes_filename']   = 'bootstrap_'
 
     return io
 
@@ -164,7 +174,7 @@ def get_maps_parameters(raw_maps_to_stack_params,raw_map_path_params,raw_map_fil
     maps = {}
 
     for imap in raw_maps_to_stack_params:
-        if bool(raw_maps_to_stack_params[imap].split()[1]) == True:
+        if string_is_true(raw_maps_to_stack_params[imap].split()[1]) == True:
             maps[imap+''] = raw_map_path_params[imap] + raw_map_file_params[imap] 
 
     return maps
@@ -173,7 +183,7 @@ def get_beams_parameters(raw_maps_to_stack_params,raw_beams_params):
     psfs = {}
 
     for imap in raw_maps_to_stack_params:
-        if bool(raw_maps_to_stack_params[imap].split()[1]) == True:
+        if string_is_true(raw_maps_to_stack_params[imap].split()[1]) == True:
             psfs[imap+'_beam_area'] = float(raw_beams_params[imap].split()[1])
             if is_float(raw_beams_params[imap].split()[0]) == True:
                 psfs[imap+'_fwhm'] = float(raw_beams_params[imap].split()[0])
@@ -186,7 +196,7 @@ def get_color_correction_parameters(raw_maps_to_stack_params,raw_color_correctio
     color_correction = {}
 
     for imap in raw_maps_to_stack_params:
-        if bool(raw_maps_to_stack_params[imap].split()[1]) == True:
+        if string_is_true(raw_maps_to_stack_params[imap].split()[1]) == True:
             color_correction[imap+''] = float(raw_color_correction_params[imap])
 
     return color_correction
@@ -205,6 +215,23 @@ def is_float(s):
         return True
     except ValueError:
         return False
+
+def string_is_true(sraw):
+    """Is string true? Returns boolean value.
+    """
+    s       = sraw.lower() # Make case-insensitive
+
+    # Lists of acceptable 'True' and 'False' strings
+    true_strings    = ['true', 't', 'yes', 'y', '1']
+    false_strings    = ['false', 'f', 'no', 'n', '0']
+    if s in true_strings:
+        return True
+    elif s in false_strings:
+        return False
+    else:
+        logging.warning("Input not recognized for parameter: %s" % (key))
+        logging.warning("You provided: %s" % (sraw))
+        raise
 
 def is_true(raw_params, key):
     """Is raw_params[key] true? Returns boolean value.

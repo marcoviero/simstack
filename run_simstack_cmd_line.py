@@ -8,6 +8,7 @@ import shutil
 import time
 import logging
 import importlib
+import numpy as np
 import pandas as pd
 from astropy.wcs import WCS
 
@@ -23,6 +24,7 @@ from utils import shift_twod
 from utils import smooth_psf
 from lmfit import Parameters, minimize, fit_report
 from simstack import stack_libraries_in_layers
+from bootstrap import Bootstrap
 
 def main():
 	# Set up logging
@@ -40,11 +42,29 @@ def main():
     # From parameter file read maps, psfs, cats, and divide them into bins
     sky_library   = get_maps(params)
     cats          = get_catalogs(params)
-    binned_ra_dec = get_bins(params, cats)
 
-    # Do simultaneous stacking 
-    pdb.set_trace()
-    stacked_flux_densities = stack_libraries_in_layers(sky_library,binned_ra_dec)
+    # Bootstrap Loop Starts here
+
+    for iboot in np.arange(params['number_of_boots'])+params['boot0']:
+        if params['bootstrap'] == True:
+            print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
+
+            #pdb.set_trace()
+            bootcat = Field_catalogs(Bootstrap(cats.table).table)
+            binned_ra_dec = get_bins(params, bootcat)
+            #shortname = params['shortname']
+            out_file_suffix =  'boot_'+str(int(iboot))
+
+        else:
+            binned_ra_dec = get_bins(params, cats)
+            #shortname = params['shortname']
+            out_file_suffix = ''
+
+        # Do simultaneous stacking 
+        stacked_flux_densities = stack_libraries_in_layers(sky_library,binned_ra_dec)
+        save_stacked_fluxes(stacked_flux_densities,params,out_file_suffix)
+        pdb.set_trace()
+
 
     # Summarize timing
     t1 = time.time()
@@ -52,7 +72,9 @@ def main():
 
     logging.info("Done!")
     logging.info("")
-    logging.info("Total time                        : {:.4f}\n".format(tpass))
+    logging.info("Total time                        : {:.4f} minutes\n".format(tpass/60.))
+
+    pdb.set_trace()
 
 def get_maps(params):
     '''
@@ -64,7 +86,6 @@ def get_maps(params):
         sky = Skymaps(params['map_files'][t],params['noise_files'][t],params['psfs'][t+'_fwhm'],color_correction=params['color_correction'][t])
         sky.add_wavelength(params['wavelength'][t])
         sky.add_fwhm(params['psfs'][t+'_fwhm']) 
-        #pdb.set_trace()
         sky_library[t] = sky 
     return sky_library 
 
@@ -91,11 +112,16 @@ def get_catalogs(params):
         pass
     elif 'ZPDF' in tbl.keys():
         tbl['z_peak']=tbl['ZPDF']
+        #tbl['z_err']=tbl[['ZPDF_L68','ZPDF_H68']].mean(axis=1)
+        tbl['z_err']=((tbl['ZPDF']-tbl['ZPDF_L68']) + (tbl['ZPDF_H68']-tbl['ZPDF']))/2.0
+        
 
     if 'LMASS' in tbl.keys():
         pass
     elif 'MASS_MED' in tbl.keys():
         tbl['LMASS']=tbl['MASS_MED']
+        #tbl['LMASS_ERR']=tbl[['MASS_MED_MIN68','MASS_MED_MAX68']].mean(axis=1)
+        tbl['LMASS_ERR']=((tbl['MASS_MED']-tbl['MASS_MED_MIN68']) + (tbl['MASS_MED_MAX68']-tbl['MASS_MED']))/2.0
 
     if 'sfg' in tbl.keys():
         pass
@@ -113,6 +139,12 @@ def get_bins(params, cats):
     binned_ra_dec = cats.subset_positions(cats.id_z_ms)
 
     return binned_ra_dec
+
+def save_stacked_fluxes(stacked_fluxes, params, out_file_suffix):
+    fpath = "%s/%s_%s_%s.npz" % (params['io']['output_folder'], params['io']['flux_densities_filename'],params['io']['shortname'],out_file_suffix)
+
+    nodes = params['bins'] 
+    np.savez(fpath, stacked_fluxes=stacked_fluxes, nodes=nodes)
 
 def is_true(raw_params, key):
     """Is raw_params[key] true? Returns boolean value.
