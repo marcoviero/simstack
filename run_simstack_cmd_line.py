@@ -53,16 +53,18 @@ def main():
             bootcat = Field_catalogs(Bootstrap(cats.table).table)
             binned_ra_dec = get_bins(params, bootcat)
             #shortname = params['shortname']
-            out_file_suffix =  'boot_'+str(int(iboot))
+            out_file_path   = params['output_bootstrap_folder'] 
+            out_file_suffix = 'boot_'+str(int(iboot))
 
         else:
             binned_ra_dec = get_bins(params, cats)
             #shortname = params['shortname']
+            out_file_path   = params['output_folder'] 
             out_file_suffix = ''
 
         # Do simultaneous stacking 
         stacked_flux_densities = stack_libraries_in_layers(sky_library,binned_ra_dec)
-        save_stacked_fluxes(stacked_flux_densities,params,out_file_suffix)
+        save_stacked_fluxes(stacked_flux_densities,params,out_file_path,out_file_suffix)
         pdb.set_trace()
 
 
@@ -140,8 +142,8 @@ def get_bins(params, cats):
 
     return binned_ra_dec
 
-def save_stacked_fluxes(stacked_fluxes, params, out_file_suffix):
-    fpath = "%s/%s_%s_%s.npz" % (params['io']['output_folder'], params['io']['flux_densities_filename'],params['io']['shortname'],out_file_suffix)
+def save_stacked_fluxes(stacked_fluxes, params, out_file_suffix, out_file_path):
+    fpath = "%s/%s_%s_%s.npz" % (out_file_path, params['io']['flux_densities_filename'],params['io']['shortname'],out_file_suffix)
 
     nodes = params['bins'] 
     np.savez(fpath, stacked_fluxes=stacked_fluxes, nodes=nodes)
