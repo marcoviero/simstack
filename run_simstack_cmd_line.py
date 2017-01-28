@@ -56,7 +56,6 @@ def main():
             #shortname = params['shortname']
             out_file_path   = params['io']['output_bootstrap_folder'] 
             out_file_suffix = '_boot_'+str(int(iboot))
-
         else:
             binned_ra_dec = get_bins(params, cats)
             #shortname = params['shortname']
@@ -119,7 +118,6 @@ def get_catalogs(params):
         #tbl['z_err']=tbl[['ZPDF_L68','ZPDF_H68']].mean(axis=1)
         tbl['z_err']=((tbl['ZPDF']-tbl['ZPDF_L68']) + (tbl['ZPDF_H68']-tbl['ZPDF']))/2.0
         
-
     if 'LMASS' in tbl.keys():
         pass
     elif 'MASS_MED' in tbl.keys():
@@ -127,12 +125,22 @@ def get_catalogs(params):
         #tbl['LMASS_ERR']=tbl[['MASS_MED_MIN68','MASS_MED_MAX68']].mean(axis=1)
         tbl['LMASS_ERR']=((tbl['MASS_MED']-tbl['MASS_MED_MIN68']) + (tbl['MASS_MED_MAX68']-tbl['MASS_MED']))/2.0
 
+    if 'lmass' in tbl.keys():
+        tbl['LMASS'] = tbl['lmass']
+
     if 'sfg' in tbl.keys():
         pass
     elif 'CLASS' in tbl.keys():
         tbl['sfg']=tbl['CLASS']
 
-    return Field_catalogs(tbl)
+    catout = Field_catalogs(tbl)
+    try: 
+        catout.table['sfg']
+        pass
+    except KeyError:
+        catout.separate_sf_qt()
+
+    return catout 
 
 def get_bins(params, cats):
 
