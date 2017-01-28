@@ -2,6 +2,7 @@ import pdb
 import numpy as np
 from astropy.wcs import WCS
 from utils import circle_mask
+from utils import clean_args
 from utils import dist_idl
 from utils import gauss_kern
 from utils import pad_and_smooth_psf
@@ -294,9 +295,9 @@ def stack_libraries_in_redshift_slices_old(
       #fit_params.add('layer'+str(iarg),value= 1e-3*np.random.randn())
       #fit_params.add('z_0.5-1.0__m_11.0-13.0_qt'+str(iarg),value= 1e-3*np.random.randn())
       #fit_params.add(lists[iarg],value= 1e-3*np.random.randn())
-      arg = lists[iarg]
-      arg=arg.replace('.','p')
-      arg=arg.replace('-','_')
+      arg = clean_args(lists[iarg])
+      #arg=arg.replace('.','p')
+      #arg=arg.replace('-','_')
       #print arg
       #arg = arg.translate(None, ''.join(['-','.']))
       fit_params.add(arg,value= 1e-3*np.random.randn())
@@ -411,9 +412,9 @@ def stack_libraries_in_redshift_slices(
       #fit_params.add('layer'+str(iarg),value= 1e-3*np.random.randn())
       #fit_params.add('z_0.5-1.0__m_11.0-13.0_qt'+str(iarg),value= 1e-3*np.random.randn())
       #fit_params.add(lists[iarg],value= 1e-3*np.random.randn())
-      arg = lists[iarg]
-      arg=arg.replace('.','p')
-      arg=arg.replace('-','_')
+      arg = clean_args(lists[iarg])
+      #arg=arg.replace('.','p')
+      #arg=arg.replace('-','_')
       #print arg
       #arg = arg.translate(None, ''.join(['-','.']))
       fit_params.add(arg,value= 1e-3*np.random.randn())
@@ -461,6 +462,7 @@ def stack_libraries_in_layers(
     cmap = map_library[map_library.keys()[iwv]].map
     cnoise = map_library[map_library.keys()[iwv]].noise
     cwv = map_library[map_library.keys()[iwv]].wavelength
+    cname = map_library.keys()[iwv]
     cwavelengths.append(cwv)
     chd = map_library[map_library.keys()[iwv]].header
     pixsize = map_library[map_library.keys()[iwv]].pixel_size
@@ -526,9 +528,9 @@ def stack_libraries_in_layers(
       #fit_params.add('layer'+str(iarg),value= 1e-3*np.random.randn())
       #fit_params.add('z_0.5-1.0__m_11.0-13.0_qt'+str(iarg),value= 1e-3*np.random.randn())
       #fit_params.add(lists[iarg],value= 1e-3*np.random.randn())
-      arg = lists[iarg]
-      arg=arg.replace('.','p')
-      arg=arg.replace('-','_')
+      arg = clean_args(lists[iarg])
+      #arg=arg.replace('.','p')
+      #arg=arg.replace('-','_')
       #print arg
       #arg = arg.translate(None, ''.join(['-','.']))
       fit_params.add(arg,value= 1e-3*np.random.randn())
@@ -538,7 +540,9 @@ def stack_libraries_in_layers(
 
     stacked_flux = np.array(cov_ss_1d.params.values())
     stacked_sed[iwv,:] = stacked_flux 
-    stacked_layers[str(cwv)] = cov_ss_1d.params
+    #Dictionary keys decided here.  Was originally wavelengths.  Changing it back to map_names
+    #stacked_layers[str(cwv)] = cov_ss_1d.params
+    stacked_layers[cname] = cov_ss_1d.params
 
     #print  map_library.keys()[iwv]+' stack completed'
     #pdb.set_trace()
@@ -664,9 +668,9 @@ def stack_multiple_fields_in_redshift_slices_old(
 
       fit_params = Parameters()
       for iarg in range(nlists): 
-        arg = lists[iarg]
-        arg=arg.replace('.','p')
-        arg=arg.replace('-','_')
+        arg = clean_args(lists[iarg])
+        #arg=arg.replace('.','p')
+        #arg=arg.replace('-','_')
         fit_params.add(arg,value= 1e-3*np.random.randn())
       imap = np.append(imap,np.ndarray.flatten(cmap[ind_fit]))
       ierr = np.append(ierr,np.ndarray.flatten(cnoise[ind_fit]))
@@ -786,9 +790,9 @@ def stack_multiple_fields_in_redshift_slices(
     fit_params = Parameters()
     arg_order = []
     for arg in lists: 
-      arg=arg.replace('.','p')
-      arg=arg.replace('-','_')
-      arg_order.append(arg)
+      #arg=arg.replace('.','p')
+      #arg=arg.replace('-','_')
+      arg_order.append(clean_args(arg))
       fit_params.add(arg,value= 1e-3*np.random.randn())
 
     #pdb.set_trace()
