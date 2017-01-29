@@ -45,7 +45,6 @@ def main():
     cats          = get_catalogs(params)
 
     # Bootstrap Loop Starts here
-
     for iboot in np.arange(params['number_of_boots'])+params['boot0']:
         if params['bootstrap'] == True:
             print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
