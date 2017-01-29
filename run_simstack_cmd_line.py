@@ -40,30 +40,44 @@ def main():
 
     t0 = time.time()
 
-    # From parameter file read maps, psfs, cats, and divide them into bins
-    sky_library   = get_maps(params)
-    cats          = get_catalogs(params)
+    # Stack in Redshift Slices Choice made here
+    if params['bins']['stack_all_z_at_once'] == True: n_slices = 1
+    else: n_slices = len(params['bins']['z_nodes']) - 1
 
-    # Bootstrap Loop Starts here
-    for iboot in np.arange(params['number_of_boots'])+params['boot0']:
-        if params['bootstrap'] == True:
-            print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
+    for i in range(n_slices):
+        if params['bins']['stack_all_z_at_once'] == True: 
+            j = None
+            stacked_flux_density_key = 'all_z'
+        else: 
+            j = i 
+            stacked_flux_density_key = str(params['bins']['z_nodes'][j])+'-'+str(params['bins']['z_nodes'][j+1])
+        print stacked_flux_density_key
+        # From parameter file read maps, psfs, cats, and divide them into bins
+        sky_library   = get_maps(params)
+        cats          = get_catalogs(params)
 
-            #pdb.set_trace()
-            bootcat = Field_catalogs(Bootstrap(cats.table).table)
-            binned_ra_dec = get_bins(params, bootcat)
-            #shortname = params['shortname']
-            out_file_path   = params['io']['output_bootstrap_folder'] 
-            out_file_suffix = '_boot_'+str(int(iboot))
-        else:
-            binned_ra_dec = get_bins(params, cats)
-            #shortname = params['shortname']
-            out_file_path   = params['io']['output_folder'] 
-            out_file_suffix = ''
+        # Bootstrap Loop Starts here
+        for iboot in np.arange(params['number_of_boots'])+params['boot0']:
+            stacked_flux_densities = {}
+            if params['bootstrap'] == True:
+                print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
 
-        # Do simultaneous stacking 
-        pdb.set_trace()
-        stacked_flux_densities = stack_libraries_in_layers(sky_library,binned_ra_dec)
+                #pdb.set_trace()
+                bootcat = Field_catalogs(Bootstrap(cats.table).table)
+                binned_ra_dec = get_bins(params, bootcat, single_slice = j)
+                #shortname = params['shortname']
+                out_file_path   = params['io']['output_bootstrap_folder'] 
+                out_file_suffix = '_boot_'+str(int(iboot))
+            else:
+                binned_ra_dec = get_bins(params, cats, single_slice = j)
+                #shortname = params['shortname']
+                out_file_path   = params['io']['output_folder'] 
+                out_file_suffix = ''
+
+            # Do simultaneous stacking 
+            pdb.set_trace()
+            stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
+
         save_stacked_fluxes(stacked_flux_densities,params,out_file_path,out_file_suffix)
         #pdb.set_trace()
 
@@ -141,14 +155,18 @@ def get_catalogs(params):
 
     return catout 
 
-def get_bins(params, cats):
+def get_bins(params, cats, single_slice = None):
 
-    z_nodes = params['bins']['z_nodes']
+    if single_slice == None:
+        z_nodes = params['bins']['z_nodes']
+    else:
+        z_nodes = params['bins']['z_nodes'][single_slice:single_slice+2]
     m_nodes = params['bins']['m_nodes']
     
     cats.get_sf_qt_mass_redshift_bins(z_nodes,m_nodes)
     binned_ra_dec = cats.subset_positions(cats.id_z_ms)
 
+    print z_nodes
     return binned_ra_dec
 
 def save_stacked_fluxes(stacked_fluxes, params, out_file_path, out_file_suffix):
