@@ -75,7 +75,7 @@ def main():
                 out_file_suffix = ''
 
             # Do simultaneous stacking 
-            pdb.set_trace()
+            #pdb.set_trace()
             stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
 
         save_stacked_fluxes(stacked_flux_densities,params,out_file_path,out_file_suffix)

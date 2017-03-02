@@ -18,7 +18,12 @@ class Bootstrap:
 
 		self.table = tbl[['ID','sfg','ra','dec','z_peak','z_err','LMASS','LMASS_ERR']]
 
-	def perturb_catalog(self, perturb_z = False):
+	def perturb_catalog(self, perturb_z = False, draw_z = False):
+		'''
+		Default is a simple bootstrap with replacement.  
+		If perturb_z is True, then the redshifts (z_peak) are perturbed by random normal with sigma z_err
+		If draw_z is True, then the redshifts are drawn from the redshift PDF (output by EAZY) of each object (TODO!)
+		'''
 
 		pseudo_cat = self.table.copy()
 		ngals = len(pseudo_cat)
@@ -27,5 +32,6 @@ class Bootstrap:
 			pseudo_z = self.table['z_peak'] + self.table['z_err']*np.random.randn(len(self.table['z_err']))
 			pseudo_cat['z_peak'] = pseudo_z
 
+		#Simple Bootstrap.  Sample draws from pseudo_cat with replacement.
 		self.pseudo_cat = pseudo_cat.sample(ngals,replace=True) 
 		#pdb.set_trace()
