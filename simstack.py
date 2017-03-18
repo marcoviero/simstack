@@ -424,7 +424,7 @@ def stack_libraries_in_redshift_slices(
 
     #pdb.set_trace()
     cov_ss_1d = minimize(simultaneous_stack_array_oned, fit_params,
-      args=(cfits_flat,), kws={'data1d':imap,'err1d':ierr})
+      args=(cfits_flat,), kws={'data1d':imap,'err1d':ierr}, nan_policy = 'propagate')
 
     stacked_flux = np.array(cov_ss_1d.params.values())
     stacked_sed[iwv,:] = stacked_flux
