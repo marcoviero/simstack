@@ -1,5 +1,6 @@
 import pdb
 import numpy as np
+import gc
 from astropy.wcs import WCS
 from utils import circle_mask
 from utils import clean_args
@@ -455,8 +456,8 @@ def stack_libraries_in_layers(
 
   lists = subcatalog_library.keys()
   nlists = len(lists)
-  stacked_sed=np.zeros([nwv, nlists])
-  stacked_sed_err=np.zeros([nwv,nlists])
+  #stacked_sed=np.zeros([nwv, nlists])
+  #stacked_sed_err=np.zeros([nwv,nlists])
   stacked_layers = {}
 
   cwavelengths = []
@@ -504,6 +505,7 @@ def stack_libraries_in_layers(
     flattened_pixmap = np.sum(layers,axis=0)
     total_circles_mask = circle_mask(flattened_pixmap, radius * fwhm, pixsize)
     ind_fit = np.where(total_circles_mask >= 1) # & zeromask != 0)
+    del total_circles_mask
     nhits = np.shape(ind_fit)[1]
     ###
     #cfits_maps = np.zeros([nlists,nhits])
@@ -530,21 +532,13 @@ def stack_libraries_in_layers(
 
     fit_params = Parameters()
     for iarg in range(nlists):
-      #fit_params.add('layer'+str(iarg),value= 1e-3*np.random.randn())
-      #fit_params.add('z_0.5-1.0__m_11.0-13.0_qt'+str(iarg),value= 1e-3*np.random.randn())
-      #fit_params.add(lists[iarg],value= 1e-3*np.random.randn())
       arg = clean_args(lists[iarg])
-      #arg=arg.replace('.','p')
-      #arg=arg.replace('-','_')
-      #print arg
-      #arg = arg.translate(None, ''.join(['-','.']))
       fit_params.add(arg,value= 1e-3*np.random.randn())
 
     cov_ss_1d = minimize(simultaneous_stack_array_oned, fit_params,
-      args=(cfits_flat,), kws={'data1d':imap,'err1d':ierr})
+      args=(cfits_flat,), kws={'data1d':imap,'err1d':ierr}, nan_policy = 'propagate')
+    del cfits_flat, imap, ierr
 
-    stacked_flux = np.array(cov_ss_1d.params.values())
-    stacked_sed[iwv,:] = stacked_flux
     #Dictionary keys decided here.  Was originally wavelengths.  Changing it back to map_names
     #stacked_layers[str(cwv)] = cov_ss_1d.params
     stacked_layers[cname] = cov_ss_1d.params
@@ -552,11 +546,8 @@ def stack_libraries_in_layers(
     #print  map_library.keys()[iwv]+' stack completed'
     #pdb.set_trace()
 
-  ind_sorted = np.argsort(np.asarray(cwavelengths))
-  new_stacked_sed = np.array([stacked_sed[i,:] for i in ind_sorted])
-
+  gc.collect
   return stacked_layers
-  #return new_stacked_sed
 
 def stack_multiple_fields_in_redshift_slices_old(
   map_library,
