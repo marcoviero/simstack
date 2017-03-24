@@ -2,6 +2,7 @@
 
 # Standard modules
 import pdb
+import os
 import os.path
 import sys
 import shutil
@@ -14,7 +15,7 @@ import cPickle as pickle
 from astropy.wcs import WCS
 
 # Modules within this package
-import parameters 
+import parameters
 from skymaps import Skymaps
 from skymaps import Field_catalogs
 from utils import circle_mask
@@ -40,17 +41,21 @@ def main():
 
     t0 = time.time()
 
-    # Stack in Redshift Slices Choice made here
+    if params['bins']['bin_in_lookback_time'] == True:
+        z_pref = 'lookt'
+    else:
+        z_pref = 'z'
+    # Stack in Slices or ALL AT ONCE Choice made here
     if params['bins']['stack_all_z_at_once'] == True: n_slices = 1
     else: n_slices = len(params['bins']['z_nodes']) - 1
 
     for i in range(n_slices):
-        if params['bins']['stack_all_z_at_once'] == True: 
+        if params['bins']['stack_all_z_at_once'] == True:
             j = None
-            stacked_flux_density_key = 'all_z'
-        else: 
-            j = i 
-            stacked_flux_density_key = str(params['bins']['z_nodes'][j])+'-'+str(params['bins']['z_nodes'][j+1])
+            stacked_flux_density_key = 'all_'+z_pref
+        else:
+            j = i
+            stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
         print stacked_flux_density_key
         # From parameter file read maps, psfs, cats, and divide them into bins
         sky_library   = get_maps(params)
@@ -66,16 +71,16 @@ def main():
                 bootcat = Field_catalogs(Bootstrap(cats.table).table)
                 binned_ra_dec = get_bins(params, bootcat, single_slice = j)
                 #shortname = params['shortname']
-                out_file_path   = params['io']['output_bootstrap_folder'] 
+                out_file_path   = params['io']['output_bootstrap_folder']
                 out_file_suffix = '_boot_'+str(int(iboot))
             else:
                 binned_ra_dec = get_bins(params, cats, single_slice = j)
                 #shortname = params['shortname']
-                out_file_path   = params['io']['output_folder'] 
+                out_file_path   = params['io']['output_folder']
                 out_file_suffix = ''
 
-            # Do simultaneous stacking 
-            #pdb.set_trace()
+            # Do simultaneous stacking
+            pdb.set_trace()
             stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
 
         save_stacked_fluxes(stacked_flux_densities,params,out_file_path,out_file_suffix)
@@ -97,18 +102,18 @@ def get_maps(params):
     Read maps and psfs and store into dictionaries
     '''
     sky_library = {}
-    
+
     for t in params['library_keys']:
         sky = Skymaps(params['map_files'][t],params['noise_files'][t],params['psfs'][t+'_fwhm'],color_correction=params['color_correction'][t])
         sky.add_wavelength(params['wavelength'][t])
-        sky.add_fwhm(params['psfs'][t+'_fwhm']) 
-        sky_library[t] = sky 
-    return sky_library 
+        sky.add_fwhm(params['psfs'][t+'_fwhm'])
+        sky_library[t] = sky
+    return sky_library
 
 def get_catalogs(params):
 
-    # This formats the different catalogs to work with existing code.  
-    # It's not the most elegant solution; better would be to make the code work with different column names.  
+    # This formats the different catalogs to work with existing code.
+    # It's not the most elegant solution; better would be to make the code work with different column names.
     tbl = pd.read_table(params['catalogs']['catalog_path']+params['catalogs']['catalog_file'],sep=',')
 
     if 'ID' in tbl.keys():
@@ -130,7 +135,7 @@ def get_catalogs(params):
         tbl['z_peak']=tbl['ZPDF']
         #tbl['z_err']=tbl[['ZPDF_L68','ZPDF_H68']].mean(axis=1)
         tbl['z_err']=((tbl['ZPDF']-tbl['ZPDF_L68']) + (tbl['ZPDF_H68']-tbl['ZPDF']))/2.0
-        
+
     if 'LMASS' in tbl.keys():
         pass
     elif 'MASS_MED' in tbl.keys():
@@ -147,13 +152,16 @@ def get_catalogs(params):
         tbl['sfg']=tbl['CLASS']
 
     catout = Field_catalogs(tbl)
-    try: 
+    try:
         catout.table['sfg']
         pass
     except KeyError:
-        catout.separate_sf_qt()
+        if len(params['populations']) > 2:
+            catout.separate_pops_by_name(params['populations'])
+        else:
+            catout.separate_sf_qt()
 
-    return catout 
+    return catout
 
 def get_bins(params, cats, single_slice = None):
 
@@ -162,9 +170,13 @@ def get_bins(params, cats, single_slice = None):
     else:
         z_nodes = params['bins']['z_nodes'][single_slice:single_slice+2]
     m_nodes = params['bins']['m_nodes']
-    
-    cats.get_sf_qt_mass_redshift_bins(z_nodes,m_nodes)
-    binned_ra_dec = cats.subset_positions(cats.id_z_ms)
+
+    if params['populations'] > 2:
+        cats.get_subpop_ids(z_nodes, m_nodes, params['populations'])
+        binned_ra_dec = cats.subset_positions(cats.subpop_ids)
+    else:
+        cats.get_sf_qt_mass_redshift_bins(z_nodes,m_nodes)
+        binned_ra_dec = cats.subset_positions(cats.id_z_ms)
 
     print z_nodes
     return binned_ra_dec
@@ -173,7 +185,7 @@ def save_stacked_fluxes(stacked_fluxes, params, out_file_path, out_file_suffix):
     fpath = "%s/%s_%s%s.p" % (out_file_path, params['io']['flux_densities_filename'],params['io']['shortname'],out_file_suffix)
     print 'pickling to '+fpath
 
-    nodes = params['bins'] 
+    nodes = params['bins']
     #pdb.set_trace()
     #np.savez(fpath, stacked_fluxes=stacked_fluxes, nodes=nodes)
     pickle.dump( [nodes, stacked_fluxes], open( fpath, "wb" ) )
