@@ -49,7 +49,7 @@ def get_params(param_file_path):
     params = get_general_params(raw_params)
     params['io'] = get_io_parameters(raw_io_params)
     params['cosmo'] = get_cosmology_parameters(raw_cosmo_params)
-    params['populations'] = get_population_parameters(raw_pop_params)
+    params['populations'] = get_population_parameters(raw_pop_params,params)
     params['map_files'] = get_maps_parameters(raw_maps_to_stack_params,raw_map_path_params,raw_map_file_params)
     params['noise_files'] = get_maps_parameters(raw_maps_to_stack_params,raw_noise_path_params,raw_noise_file_params)
     params['wavelength'] = get_wavelength_parameters(raw_maps_to_stack_params)
@@ -71,7 +71,7 @@ def get_general_params(raw_params):
 
     # Type of galaxy split.  Default is UVJ star-forming / quiescent
     try:
-        params['galaxy_splitting_scheme'] = raw_params['populations']
+        params['galaxy_splitting_scheme'] = raw_params['classification_scheme']
     except KeyError:
         params['galaxy_splitting_scheme'] = 'sf-qt'
 
@@ -86,6 +86,7 @@ def get_general_params(raw_params):
         params['number_of_boots'] = 1
 
     return params
+
 def get_wavelength_parameters(raw_maps_to_stack_params):
     wavelengths = {}
 
@@ -155,11 +156,14 @@ def get_io_parameters(raw_params):
         io['shortname']              = raw_params['shortname']
     except KeyError:
         io['shortname']              = ''
-    io['output_folder']              = raw_params['output_folder']
+
+    io['output_folder']              = os.environ[raw_params['output_folder'].split()[0]] + raw_params['output_folder'].split()[1] # raw_params['output_folder']
     try:
-        io['output_bootstrap_folder']= raw_params['output_bootstrap_folder']
+        io['output_bootstrap_folder'] = os.environ[raw_params['output_bootstrap_folder'].split()[0]] + raw_params['output_bootstrap_folder'].split()[1] # raw_params['output_bootstrap_folder']
     except KeyError:
-        io['output_bootstrap_folder']= raw_params['output_folder']
+        io['output_bootstrap_folder'] = io['output_folder']
+
+    #maps[imap] = os.environ[raw_params['output_bootstrap_folder'].split()[0]] + raw_params['output_bootstrap_folder'].split()[1]
     io['flux_densities_filename']    = raw_params['flux_densities_filename']
     try:
         io['boot_fluxes_filename']   = raw_params['boot_fluxes_filename']
@@ -185,31 +189,40 @@ def get_cosmology_parameters(raw_params):
 
     return cosmo
 
-def get_population_parameters(raw_pop_params):
+def get_population_parameters(raw_pop_params, params):
 
     cuts_dict = {}
-    for pop in raw_pop_params:
-        print pop
-        tst = [int(raw_pop_params[pop][0])]
-        if len(raw_pop_params[pop].split()) > 1:
-            tst.append([k for k in raw_pop_params[pop][1:].split()])
-            for k in range(len(tst[1])):
-                try:
-                    bl = string_is_true(tst[1][k])
-                    tst[1][k] = bl
-                    #print 'is a boolean'
-                except NameError:
+    if params['galaxy_splitting_scheme'] == 'general':
+        for pop in raw_pop_params:
+            print pop
+            tst = [int(raw_pop_params[pop][0])]
+            if len(raw_pop_params[pop].split()) > 1:
+                tst.append([k for k in raw_pop_params[pop][1:].split()])
+                for k in range(len(tst[1])):
                     try:
-                        float(tst[1][1])
-                        tst[1][k]=float(tst[1][k])
-                        #print 'is a float'
-                    except ValueError:
-                        #print 'do nothin'
-                        pass
-        else:
-            tst.append([])
+                        bl = string_is_true(tst[1][k])
+                        tst[1][k] = bl
+                        #print 'is a boolean'
+                    except NameError:
+                        try:
+                            float(tst[1][1])
+                            tst[1][k]=float(tst[1][k])
+                            #print 'is a float'
+                        except ValueError:
+                            #print 'do nothin'
+                            pass
+            else:
+                tst.append([])
 
-        cuts_dict[pop] = tst
+            cuts_dict[pop] = tst
+
+    elif params['galaxy_splitting_scheme'] == '4pops' or params['galaxy_splitting_scheme'] == '5pops':
+        for pop in raw_pop_params:
+            cuts_dict[pop] = float(raw_pop_params[pop])
+
+    elif params['galaxy_splitting_scheme'] == 'uvj':
+        cuts_dict['c_nodes'] = [float(n) for n in raw_pop_params['uvj_nodes'].split()]
+        cuts_dict['pop_names'] = [n for n in raw_pop_params['pop_names'].split()]
 
     return cuts_dict
 
@@ -250,7 +263,10 @@ def get_catalogs_parameters(raw_catalog_params):
         catalog['catalog_path'] = os.environ[raw_catalog_params['catalog_path'].split()[0]] + raw_catalog_params['catalog_path'].split()[1]
     except:
         catalog['catalog_path'] = raw_catalog_params['catalog_path']
+
     catalog['catalog_file'] = raw_catalog_params['catalog_file']
+    if 'features_file' in raw_catalog_params:
+        catalog['features_file'] = raw_catalog_params['features_file']
 
     return catalog
 
