@@ -71,21 +71,23 @@ def main():
                 bootcat = Field_catalogs(Bootstrap(cats.table).table)
                 binned_ra_dec = get_bins(params, bootcat, single_slice = j)
                 #shortname = params['shortname']
-                out_file_path   = params['io']['output_bootstrap_folder']
-                out_file_suffix = '_boot_'+str(int(iboot))
+                out_file_path   = params['io']['output_bootstrap_folder']+'/'+params['io']['shortname']
+                out_file_suffix = '_'+stacked_flux_density_key+'_boot_'+str(int(iboot))
             else:
                 binned_ra_dec = get_bins(params, cats, single_slice = j)
                 #shortname = params['shortname']
-                out_file_path   = params['io']['output_folder']
-                out_file_suffix = ''
+                out_file_path   = params['io']['output_folder']+'/'+params['io']['shortname']
+                out_file_suffix = '_'+stacked_flux_density_key
 
             # Do simultaneous stacking
-            pdb.set_trace()
+            #pdb.set_trace()
             stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
 
         save_stacked_fluxes(stacked_flux_densities,params,out_file_path,out_file_suffix)
         #pdb.set_trace()
 
+    #Save Parameter file in folder
+    save_paramfile(params)
 
     # Summarize timing
     t1 = time.time()
@@ -94,8 +96,6 @@ def main():
     logging.info("Done!")
     logging.info("")
     logging.info("Total time                        : {:.4f} minutes\n".format(tpass/60.))
-
-    pdb.set_trace()
 
 def get_maps(params):
     '''
@@ -171,12 +171,41 @@ def get_bins(params, cats, single_slice = None):
         z_nodes = params['bins']['z_nodes'][single_slice:single_slice+2]
     m_nodes = params['bins']['m_nodes']
 
-    if params['populations'] > 2:
-        cats.get_subpop_ids(z_nodes, m_nodes, params['populations'])
-        binned_ra_dec = cats.subset_positions(cats.subpop_ids)
-    else:
+    #if params['populations'] > 2:
+    #    cats.get_subpop_ids(z_nodes, m_nodes, params['populations'])
+    #    binned_ra_dec = cats.subset_positions(cats.subpop_ids)
+    #else:
+    #    cats.get_sf_qt_mass_redshift_bins(z_nodes,m_nodes)
+    #    binned_ra_dec = cats.subset_positions(cats.id_z_ms)
+
+    if params['galaxy_splitting_scheme'] == 'sf-qt':
+        cats.separate_sf_qt()
         cats.get_sf_qt_mass_redshift_bins(z_nodes,m_nodes)
         binned_ra_dec = cats.subset_positions(cats.id_z_ms)
+    elif params['galaxy_splitting_scheme'] == '5pops':
+        Fcut = params['populations']['fcut']
+        MIPS24_cut = params['populations']['mips24_cut']
+        cats.separate_5pops(Fcut=Fcut,MIPS24_cut=MIPS24_cut)
+        cats.get_5pops_mass_redshift_bins(z_nodes,m_nodes)
+        binned_ra_dec = cats.subset_positions(cats.id_z_ms_5pop)
+    elif params['galaxy_splitting_scheme'] == '4pops':
+        Fcut = params['populations']['fcut']
+        age_cut = params['populations']['age_cut']
+        cats.separate_4pops(Fcut=Fcut,age_cut=age_cut)
+        cats.get_4pops_mass_redshift_bins(z_nodes,m_nodes)
+        binned_ra_dec = cats.subset_positions(cats.id_z_ms_4pop)
+    elif params['galaxy_splitting_scheme'] == 'uvj':
+        c_nodes = params['populations']['c_nodes']
+        c_names = params['populations']['pop_names']
+        cats.table['UVJ']=np.sqrt((cats.table['rf_U_V'] - np.min(cats.table['rf_U_V']))**2 + (cats.table['rf_V_J']-np.min(cats.table['rf_V_J'])) ** 2)
+        cats.separate_uvj_pops(c_nodes)
+        cats.get_mass_redshift_uvj_bins(z_nodes,m_nodes,c_names)
+        binned_ra_dec = cats.subset_positions(cats.id_z_ms_pop)
+    elif params['galaxy_splitting_scheme'] == 'general':
+        cuts_dict = params['populations']
+        cats.separate_pops_by_name(cuts_dict)
+        cats.get_subpop_ids(z_nodes, m_nodes, cuts_dict)
+        binned_ra_dec = cats.subset_positions(cats.subpop_ids)
 
     print z_nodes
     return binned_ra_dec
@@ -184,11 +213,25 @@ def get_bins(params, cats, single_slice = None):
 def save_stacked_fluxes(stacked_fluxes, params, out_file_path, out_file_suffix):
     fpath = "%s/%s_%s%s.p" % (out_file_path, params['io']['flux_densities_filename'],params['io']['shortname'],out_file_suffix)
     print 'pickling to '+fpath
+    if not os.path.exists(out_file_path): os.makedirs(out_file_path)
 
     nodes = params['bins']
     #pdb.set_trace()
     #np.savez(fpath, stacked_fluxes=stacked_fluxes, nodes=nodes)
     pickle.dump( [nodes, stacked_fluxes], open( fpath, "wb" ) )
+
+def save_paramfile(params):
+    fp_in    = params['io']['param_file_path']
+    outdir   = params['io']['output_folder']+'/'+params['io']['shortname']
+    fname    = os.path.basename(fp_in)
+    fp_out   = os.path.join(outdir, fname)
+
+    logging.info("Copying parameter file...")
+    logging.info("  FROM : {}".format(fp_in))
+    logging.info("    TO : {}".format(fp_out))
+    logging.info("")
+
+    shutil.copyfile(fp_in, fp_out)
 
 def is_true(raw_params, key):
     """Is raw_params[key] true? Returns boolean value.
