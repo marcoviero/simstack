@@ -152,14 +152,14 @@ def get_catalogs(params):
         tbl['sfg']=tbl['CLASS']
 
     catout = Field_catalogs(tbl)
-    try:
-        catout.table['sfg']
-        pass
-    except KeyError:
-        if len(params['populations']) > 2:
-            catout.separate_pops_by_name(params['populations'])
-        else:
-            catout.separate_sf_qt()
+    #try:
+    #    catout.table['sfg']
+    #    pass
+    #except KeyError:
+    #    if len(params['populations']) > 2:
+    #        catout.separate_pops_by_name(params['populations'])
+    #    else:
+    #        catout.separate_sf_qt()
 
     return catout
 
@@ -183,14 +183,14 @@ def get_bins(params, cats, single_slice = None):
         cats.get_sf_qt_mass_redshift_bins(z_nodes,m_nodes)
         binned_ra_dec = cats.subset_positions(cats.id_z_ms)
     elif params['galaxy_splitting_scheme'] == '5pops':
-        Fcut = params['populations']['fcut']
-        MIPS24_cut = params['populations']['mips24_cut']
+        Fcut = params['cuts']['fcut']
+        MIPS24_cut = params['cuts']['mips24_cut']
         cats.separate_5pops(Fcut=Fcut,MIPS24_cut=MIPS24_cut)
         cats.get_5pops_mass_redshift_bins(z_nodes,m_nodes)
         binned_ra_dec = cats.subset_positions(cats.id_z_ms_5pop)
     elif params['galaxy_splitting_scheme'] == '4pops':
-        Fcut = params['populations']['fcut']
-        age_cut = params['populations']['age_cut']
+        Fcut = params['cuts']['fcut']
+        age_cut = params['cuts']['age_cut']
         cats.separate_4pops(Fcut=Fcut,age_cut=age_cut)
         cats.get_4pops_mass_redshift_bins(z_nodes,m_nodes)
         binned_ra_dec = cats.subset_positions(cats.id_z_ms_4pop)
