@@ -65,6 +65,7 @@ def main():
         for iboot in np.arange(params['number_of_boots'])+params['boot0']:
             stacked_flux_densities = {}
             if params['bootstrap'] == True:
+                pdb.set_trace()
                 print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
 
                 #pdb.set_trace()
@@ -80,10 +81,10 @@ def main():
                 out_file_suffix = '_'+stacked_flux_density_key
 
             # Do simultaneous stacking
-            #pdb.set_trace()
+            pdb.set_trace()
             stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
 
-        save_stacked_fluxes(stacked_flux_densities,params,out_file_path,out_file_suffix)
+            save_stacked_fluxes(stacked_flux_densities,params,out_file_path,out_file_suffix)
         #pdb.set_trace()
 
     #Save Parameter file in folder
