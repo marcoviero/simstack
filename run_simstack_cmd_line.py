@@ -104,7 +104,7 @@ def get_maps(params):
     sky_library = {}
 
     for t in params['library_keys']:
-        sky = Skymaps(params['map_files'][t],params['noise_files'][t],params['psfs'][t+'_fwhm'],color_correction=params['color_correction'][t])
+        sky = Skymaps(params['map_files'][t],params['noise_files'][t],params['psfs'][t+'_fwhm'],color_correction=params['color_correction'][t], beam_area=params['psfs'][t+'_beam_area'])
         sky.add_wavelength(params['wavelength'][t])
         sky.add_fwhm(params['psfs'][t+'_fwhm'])
         sky_library[t] = sky
