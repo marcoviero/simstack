@@ -192,7 +192,7 @@ def get_cosmology_parameters(raw_params):
     return cosmo
 
 def get_cut_parameters(raw_cut_params):
-    cuts_dict{}
+    cuts_dict = {}
     # Special case for 5pop and 4pop
     for pop in raw_cut_params:
         cuts_dict[pop] = float(raw_cut_params[pop])
