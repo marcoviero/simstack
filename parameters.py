@@ -32,6 +32,7 @@ def get_params(param_file_path):
     raw_params = dict(config.items('general'))
     raw_cosmo_params = dict(config.items('cosmology'))
     raw_pop_params = dict(config.items('populations'))
+    raw_cut_params = dict(config.items('cuts'))
     raw_io_params = dict(config.items('io'))
     raw_binning_params = dict(config.items('binning'))
     raw_maps_to_stack_params = dict(config.items('maps_to_stack'))
@@ -50,6 +51,7 @@ def get_params(param_file_path):
     params['io'] = get_io_parameters(raw_io_params)
     params['cosmo'] = get_cosmology_parameters(raw_cosmo_params)
     params['populations'] = get_population_parameters(raw_pop_params,params)
+    params['cuts'] = get_cut_parameters(raw_cut_params)
     params['map_files'] = get_maps_parameters(raw_maps_to_stack_params,raw_map_path_params,raw_map_file_params)
     params['noise_files'] = get_maps_parameters(raw_maps_to_stack_params,raw_noise_path_params,raw_noise_file_params)
     params['wavelength'] = get_wavelength_parameters(raw_maps_to_stack_params)
@@ -188,6 +190,13 @@ def get_cosmology_parameters(raw_params):
     cosmo       = ac.LambdaCDM(H0=H0, Om0=omega_m0, Ode0=omega_l0)
 
     return cosmo
+
+def get_cut_parameters(raw_cut_params):
+    cuts_dict{}
+    # Special case for 5pop and 4pop
+    for pop in raw_cut_params:
+        cuts_dict[pop] = float(raw_cut_params[pop])
+    return cuts_dict
 
 def get_population_parameters(raw_pop_params, params):
 
