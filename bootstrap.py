@@ -38,7 +38,9 @@ class Bootstrap:
 		ngals = len(pseudo_cat)
 
 		if perturb_z == True:
-			pseudo_z = self.table['z_peak'] + self.table['z_err']*np.random.randn(len(self.table['z_err']))
+			#pseudo_z = self.table['z_peak'] + self.table['z_err']*np.random.randn(len(self.table['z_err']))
+			pseudo_z = self.table['z_peak'] + self.table['z_peak'].iloc[np.random.randint(0, ngals, size=ngals)]
+			self.table['z_err']*np.random.randn(len(self.table['z_err']))
 			pseudo_cat['z_peak'] = pseudo_z
 
 		#Simple Bootstrap.  Sample draws from pseudo_cat with replacement.
