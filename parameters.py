@@ -166,10 +166,10 @@ def get_io_parameters(raw_params):
         io['shortname']              = ''
 
     io['output_folder']              = os.environ[raw_params['output_folder'].split()[0]] + raw_params['output_folder'].split()[1] # raw_params['output_folder']
-    try:
-        io['output_bootstrap_folder'] = os.environ[raw_params['output_bootstrap_folder'].split()[0]] + raw_params['output_bootstrap_folder'].split()[1] # raw_params['output_bootstrap_folder']
-    except KeyError:
-        io['output_bootstrap_folder'] = io['output_folder']
+    #try:
+    #    io['output_bootstrap_folder'] = os.environ[raw_params['output_bootstrap_folder'].split()[0]] + raw_params['output_bootstrap_folder'].split()[1] # raw_params['output_bootstrap_folder']
+    #except KeyError:
+    #    io['output_bootstrap_folder'] = io['output_folder']
 
     #maps[imap] = os.environ[raw_params['output_bootstrap_folder'].split()[0]] + raw_params['output_bootstrap_folder'].split()[1]
     io['flux_densities_filename']    = raw_params['flux_densities_filename']
