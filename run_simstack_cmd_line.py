@@ -67,9 +67,11 @@ def main():
             if params['bootstrap'] == True:
                 print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
 
-                #pdb.set_trace()
-                bootcat = Field_catalogs(Bootstrap(cats.table).table)
-                bootcat.perturb_catalog(perturb_z = self.params['bootstrap'])
+                # pcat is an instance of Bootstrap
+                # pcat.perturb_catalog with options encoded in parameter file
+                pcat = Bootstrap(cats.table)
+                pcat.perturb_catalog(perturb_z = params['perturb_z'])
+                bootcat = Field_catalogs(pcat.table)
                 binned_ra_dec = get_bins(params, bootcat, single_slice = j)
                 #shortname = params['shortname']
                 out_file_path   = params['io']['output_folder']+'/bootstrapped_fluxes/'+params['io']['shortname']
