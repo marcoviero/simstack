@@ -69,7 +69,7 @@ def main():
 
                 #pdb.set_trace()
                 bootcat = Field_catalogs(Bootstrap(cats.table).table)
-                bootcat.perturb_catalog(perturb_z = self.params[])
+                bootcat.perturb_catalog(perturb_z = self.params['bootstrap'])
                 binned_ra_dec = get_bins(params, bootcat, single_slice = j)
                 #shortname = params['shortname']
                 out_file_path   = params['io']['output_folder']+'/bootstrapped_fluxes/'+params['io']['shortname']
