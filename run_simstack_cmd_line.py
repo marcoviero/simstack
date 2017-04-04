@@ -69,14 +69,15 @@ def main():
 
                 #pdb.set_trace()
                 bootcat = Field_catalogs(Bootstrap(cats.table).table)
+                bootcat.perturb_catalog(perturb_z = self.params[])
                 binned_ra_dec = get_bins(params, bootcat, single_slice = j)
                 #shortname = params['shortname']
-                out_file_path   = params['io']['output_bootstrap_folder']+'/'+params['io']['shortname']
+                out_file_path   = params['io']['output_folder']+'/bootstrapped_fluxes/'+params['io']['shortname']
                 out_file_suffix = '_'+stacked_flux_density_key+'_boot_'+str(int(iboot))
             else:
                 binned_ra_dec = get_bins(params, cats, single_slice = j)
                 #shortname = params['shortname']
-                out_file_path   = params['io']['output_folder']+'/'+params['io']['shortname']
+                out_file_path   = params['io']['output_folder'] + '/simstack_fluxes/' + params['io']['shortname']
                 out_file_suffix = '_'+stacked_flux_density_key
 
             # Do simultaneous stacking
