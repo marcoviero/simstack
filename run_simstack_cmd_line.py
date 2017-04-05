@@ -229,7 +229,7 @@ def save_stacked_fluxes(stacked_fluxes, params, out_file_path, out_file_suffix):
 def save_paramfile(params):
     fp_in    = params['io']['param_file_path']
     if params['bootstrap'] == True:
-        outdir   = params['io']['output_folder']+'/bootstrap_fluxes/'+params['io']['shortname']
+        outdir   = params['io']['output_folder']+'/bootstrapped_fluxes/'+params['io']['shortname']
     else:
         outdir   = params['io']['output_folder']+'/simstack_fluxes/'+params['io']['shortname']
     fname    = os.path.basename(fp_in)
