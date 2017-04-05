@@ -37,10 +37,11 @@ class Bootstrap:
 		pseudo_cat = self.table.copy()
 		ngals = len(pseudo_cat)
 		if boot_indices_path != False:
-			if not os.path.exists(boot_indices_path): os.makedirs(boot_indices_path)
-			boot_indices = []
-		else:
-			boot_indices =  pickle.load( open( boot_indices_path, "rb" ))
+			if not os.path.exists(boot_indices_path):
+				os.makedirs(boot_indices_path)
+				boot_indices = []
+			else:
+				boot_indices =  pickle.load( open( boot_indices_path, "rb" ))
 
 		if perturb_z == True:
 			pseudo_z = self.table['z_peak'] + self.table['z_err']*np.random.randn(len(self.table['z_err']))
@@ -49,9 +50,8 @@ class Bootstrap:
 			pseudo_cat['z_peak'] = pseudo_z
 		#Simple Bootstrap.  Sample draws from pseudo_cat with replacement.
 		self.pseudo_cat = pseudo_cat.sample(ngals,replace=True)
-		boot_indices.append(self.pseudo_cat.index)
-		#pdb.set_trace()
 		if boot_indices_path != False:
+			boot_indices.append(self.pseudo_cat.index)
 			#save pickle
 			pickle.dump( boot_indices, open( fpath, "wb" ) )
 
