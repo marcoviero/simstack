@@ -17,7 +17,6 @@ from utils import shift_twod
 from utils import smooth_psf
 from lmfit import Parameters, minimize, fit_report
 
-
 class PickledStacksReader:
 
 	def __init__(self, config_path, config_file):
