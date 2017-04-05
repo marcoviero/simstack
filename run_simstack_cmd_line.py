@@ -60,6 +60,8 @@ def main():
         # From parameter file read maps, psfs, cats, and divide them into bins
         sky_library   = get_maps(params)
         cats          = get_catalogs(params)
+        if params['bootstrap'] == True:
+            pcat = Bootstrap(cats.table)
 
         # Bootstrap Loop Starts here
         for iboot in np.arange(params['number_of_boots'])+params['boot0']:
@@ -69,9 +71,10 @@ def main():
 
                 # pcat is an instance of Bootstrap
                 # pcat.perturb_catalog with options encoded in parameter file
-                pcat = Bootstrap(cats.table)
                 pcat.perturb_catalog(perturb_z = params['perturb_z'])
-                bootcat = Field_catalogs(pcat.table)
+                bootcat = Field_catalogs(pcat.pseudo_cat)
+                #bootcat = Field_catalogs(Bootstrap(pcat.pseudo_cat).table)
+                #bootcat = Field_catalogs(Bootstrap(cats.table).table)
                 binned_ra_dec = get_bins(params, bootcat, single_slice = j)
                 #shortname = params['shortname']
                 out_file_path   = params['io']['output_folder']+'/bootstrapped_fluxes/'+params['io']['shortname']
@@ -225,7 +228,10 @@ def save_stacked_fluxes(stacked_fluxes, params, out_file_path, out_file_suffix):
 
 def save_paramfile(params):
     fp_in    = params['io']['param_file_path']
-    outdir   = params['io']['output_folder']+'/'+params['io']['shortname']
+    if params['bootstrap'] == True:
+        outdir   = params['io']['output_folder']+'/bootstrap_fluxes/'+params['io']['shortname']
+    else:
+        outdir   = params['io']['output_folder']+'/simstack_fluxes/'+params['io']['shortname']
     fname    = os.path.basename(fp_in)
     fp_out   = os.path.join(outdir, fname)
 
