@@ -88,10 +88,20 @@ def get_general_params(raw_params):
         params['bootstrap'] = True
         params['boot0'] = float(raw_params['bootstrap'].split()[1])
         params['number_of_boots'] = float(raw_params['bootstrap'].split()[2])
+        try:
+            params['perturb_z'] = string_is_true(raw_params['bootstrap'].split()[3])
+        except:
+            params['perturb_z'] = False
+        try:
+            params['index_boots'] = string_is_true(raw_params['bootstrap'].split()[4])
+        except:
+            params['index_boots'] = False
+        #pdb.set_trace()
     else:
         params['bootstrap'] = False
         params['boot0'] = 0
         params['number_of_boots'] = 1
+        params['perturb_z'] = False
 
     return params
 
@@ -124,10 +134,15 @@ def get_binning_parameters(raw_params):
         except KeyError:
             pass
 
-    # If binning in lookback time.
-    # Should expand to bin in number densities in future...
+    # If binning masses by Number Densities
     try:
-        binning['bin_in_lookback_time'] = is_true(raw_params, 'bin_in_lookbackt')
+        binning['bin_in_number_density'] = is_true(raw_params, 'bin_in_number_density')
+    except KeyError:
+        binning['bin_in_number_density'] = False
+
+    # If binning redshifts in lookback time.
+    try:
+        binning['bin_in_lookback_time'] = is_true(raw_params, 'bin_in_lookback_time')
     except KeyError:
         binning['bin_in_lookback_time'] = False
 
@@ -145,10 +160,24 @@ def get_binning_parameters(raw_params):
             z_nodes.append(float(i))
         for j in raw_params['mass_nodes'].split():
             m_nodes.append(float(j))
+        if binning['bin_in_number_density'] == True:
+            nd_nodes = []
+            try:
+                for j in raw_params['number_density_nodes'].split():
+                    nd_nodes.append(float(j))
+            except:
+                for j in raw_params['mass_nodes'].split():
+                    nd_nodes.append(float(j))
+
 
         binning['t_nodes'] = z_nodes
         binning['z_nodes'] = z_nodes
         binning['m_nodes'] = m_nodes
+        #binning['nd_nodes'] = nd_nodes
+
+        # This is tough...
+        if binning['bin_in_number_density'] == True:
+            binning['m_nodes'] = np.array([NDpredict.getmass_illustris(nd_nodes,z_mid[i]) for i in m_nodes])
 
         if binning['bin_in_lookback_time'] == True:
             binning['t_nodes'] = z_nodes

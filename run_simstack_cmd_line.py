@@ -17,7 +17,7 @@ from astropy.wcs import WCS
 # Modules within this package
 import parameters
 from skymaps import Skymaps
-from skymaps import Field_catalogs
+from bincatalogs import Field_catalogs
 from utils import circle_mask
 from utils import dist_idl
 from utils import gauss_kern
@@ -68,19 +68,25 @@ def main():
             stacked_flux_densities = {}
             if params['bootstrap'] == True:
                 print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
-
+                if params['index_boots'] == True:
+                    boot_indices_path = params['io']['output_folder']+'/bootstrapped_fluxes/bootstrap_indices/'
+                    boot_index_key = ''
+                    if not os.path.exists(boot_indices_path): os.makedirs(boot_indices_path)
+                else:
+                    boot_indices_path = False
+                    boot_index_key = None
                 # pcat is an instance of Bootstrap
                 # pcat.perturb_catalog with options encoded in parameter file
-                pcat.perturb_catalog(perturb_z = params['perturb_z'])
+                pcat.perturb_catalog(perturb_z = params['perturb_z'], boot_indices_path = boot_indices_path, boot_index_key = boot_index_key)
                 bootcat = Field_catalogs(pcat.pseudo_cat)
                 #bootcat = Field_catalogs(Bootstrap(pcat.pseudo_cat).table)
                 #bootcat = Field_catalogs(Bootstrap(cats.table).table)
-                binned_ra_dec = get_bins(params, bootcat, single_slice = j)
+                binned_ra_dec = get_bin_radec(params, bootcat, single_slice = j)
                 #shortname = params['shortname']
                 out_file_path   = params['io']['output_folder']+'/bootstrapped_fluxes/'+params['io']['shortname']
                 out_file_suffix = '_'+stacked_flux_density_key+'_boot_'+str(int(iboot))
             else:
-                binned_ra_dec = get_bins(params, cats, single_slice = j)
+                binned_ra_dec = get_bin_radec(params, cats, single_slice = j)
                 #shortname = params['shortname']
                 out_file_path   = params['io']['output_folder'] + '/simstack_fluxes/' + params['io']['shortname']
                 out_file_suffix = '_'+stacked_flux_density_key
@@ -169,7 +175,7 @@ def get_catalogs(params):
 
     return catout
 
-def get_bins(params, cats, single_slice = None):
+def get_bin_radec(params, cats, single_slice = None):
 
     if single_slice == None:
         z_nodes = params['bins']['z_nodes']

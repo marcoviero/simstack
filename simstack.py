@@ -48,6 +48,12 @@ class PickledStacksReader:
 		#self.bootstrap_error_array = {}
 		#self.bootstrap_error_dict = {}
 		#self.binsize_error_array  = {}
+		self.read_pickles()
+		if self.params['bootstrap'] == True:
+			ax = len(np.shape(self.bootstrap_flux_array)) - 1
+			self.boot_error_bars = np.sqrt(np.var(self.bootstrap_flux_array,axis=ax))
+
+			#self.covariance =
 
 	def get_error_bar_dictionary(self):
 		print 'return a dictionary with nodes for keys'

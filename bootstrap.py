@@ -27,7 +27,7 @@ class Bootstrap:
 		#	self.table = tbl[['ID','sfg','ra','dec','z_peak','LMASS','mips24','F_ratio']]
 		self.table = tbl
 
-	def perturb_catalog(self, perturb_z = False, draw_z = False, boot_indices_path = False):
+	def perturb_catalog(self, perturb_z = False, draw_z = False, boot_indices_path = False, boot_index_key = None):
 		'''
 		Default is a simple bootstrap with replacement.
 		If perturb_z is True, then the redshifts (z_peak) are perturbed by random normal with sigma z_err
@@ -39,19 +39,23 @@ class Bootstrap:
 		if boot_indices_path != False:
 			if not os.path.exists(boot_indices_path):
 				os.makedirs(boot_indices_path)
-				boot_indices = []
+				if boot_index_key == None:
+					boot_indices = []
+				else:
+					boot_indices = {}
 			else:
 				boot_indices =  pickle.load( open( boot_indices_path, "rb" ))
 
 		if perturb_z == True:
 			pseudo_z = self.table['z_peak'] + self.table['z_err']*np.random.randn(len(self.table['z_err']))
 			#pseudo_z = self.table['z_peak'] + self.table['z_peak'].iloc[np.random.randint(0, ngals, size=ngals)]
-			self.table['z_err']*np.random.randn(len(self.table['z_err']))
+			#self.table['z_err']*np.random.randn(len(self.table['z_err']))
 			pseudo_cat['z_peak'] = pseudo_z
 		#Simple Bootstrap.  Sample draws from pseudo_cat with replacement.
 		self.pseudo_cat = pseudo_cat.sample(ngals,replace=True)
 		if boot_indices_path != False:
-			boot_indices.append(self.pseudo_cat.index)
+			if boot_index_key == None: boot_indices = boot_indices.append(self.pseudo_cat.index)
+			boot_indices[boot_index_key] =self.pseudo_cat.index
 			#save pickle
 			pickle.dump( boot_indices, open( fpath, "wb" ) )
 
