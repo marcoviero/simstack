@@ -1,3 +1,16 @@
+import pdb
+import six
+import numpy as np
+from astropy.io import fits
+import astropy.units as u
+from utils import bin_ndarray as rebin
+from utils import gauss_kern
+from utils import clean_nans
+from utils import clean_args
+from astropy import cosmology
+from astropy.cosmology import Planck15 as cosmo
+from astropy.cosmology import Planck15, z_at_value
+
 class Field_catalogs:
 	def __init__(self, tbl):
 		self.table = tbl
