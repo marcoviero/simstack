@@ -8,6 +8,7 @@ import astropy.cosmology as ac
 from astropy.cosmology import Planck15 as cosmo
 from astropy.cosmology import Planck15, z_at_value
 import astropy.units as u
+import NDpredict
 from utils import string_is_true
 #from astropy.cosmology import Planck15 as cosmo
 
@@ -177,6 +178,7 @@ def get_binning_parameters(raw_params):
 
         # This is tough...
         if binning['bin_in_number_density'] == True:
+            pdb.set_trace()
             binning['m_nodes'] = np.array([NDpredict.getmass_illustris(nd_nodes,z_mid[i]) for i in m_nodes])
 
         if binning['bin_in_lookback_time'] == True:
