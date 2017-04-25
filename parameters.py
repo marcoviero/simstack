@@ -32,7 +32,10 @@ def get_params(param_file_path):
     # Get "raw" dictionaries from `config` object
     raw_params = dict(config.items('general'))
     raw_cosmo_params = dict(config.items('cosmology'))
-    raw_pop_params = dict(config.items('populations'))
+    try:
+        raw_pop_params = dict(config.items('populations'))
+    except:
+        pass
     try:
         raw_cut_params = dict(config.items('cuts'))
     except:
@@ -54,7 +57,10 @@ def get_params(param_file_path):
     params = get_general_params(raw_params)
     params['io'] = get_io_parameters(raw_io_params)
     params['cosmo'] = get_cosmology_parameters(raw_cosmo_params)
-    params['populations'] = get_population_parameters(raw_pop_params,params)
+    try:
+        params['populations'] = get_population_parameters(raw_pop_params,params)
+    except:
+        pass
     try:
         params['cuts'] = get_cut_parameters(raw_cut_params)
     except:
