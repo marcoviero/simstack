@@ -79,15 +79,13 @@ def main():
                 # pcat.perturb_catalog with options encoded in parameter file
                 pcat.perturb_catalog(perturb_z = params['perturb_z'], boot_indices_path = boot_indices_path, boot_index_key = boot_index_key)
                 bootcat = Field_catalogs(pcat.pseudo_cat)
-                #bootcat = Field_catalogs(Bootstrap(pcat.pseudo_cat).table)
-                #bootcat = Field_catalogs(Bootstrap(cats.table).table)
                 binned_ra_dec = get_bin_radec(params, bootcat, single_slice = j)
-                #shortname = params['shortname']
+                bin_ids = get_bin_ids(params, bootcat, single_slice = j)
                 out_file_path   = params['io']['output_folder']+'/bootstrapped_fluxes/'+params['io']['shortname']
                 out_file_suffix = '_'+stacked_flux_density_key+'_boot_'+str(int(iboot))
             else:
                 binned_ra_dec = get_bin_radec(params, cats, single_slice = j)
-                #shortname = params['shortname']
+                bin_ids = get_bin_ids(params, cats, single_slice = j)
                 out_file_path   = params['io']['output_folder'] + '/simstack_fluxes/' + params['io']['shortname']
                 out_file_suffix = '_'+stacked_flux_density_key
 
@@ -95,7 +93,7 @@ def main():
             #pdb.set_trace()
             stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
 
-            save_stacked_fluxes(stacked_flux_densities,params,out_file_path,out_file_suffix)
+            save_stacked_fluxes(stacked_flux_densities,params,bin_ids, out_file_path,out_file_suffix)
         #pdb.set_trace()
 
     #Save Parameter file in folder
@@ -175,7 +173,7 @@ def get_catalogs(params):
 
     return catout
 
-def get_bin_radec(params, cats, single_slice = None):
+def get_bin_ids(params, cats, single_slice = None):
 
     if single_slice == None:
         z_nodes = params['bins']['z_nodes']
@@ -183,12 +181,44 @@ def get_bin_radec(params, cats, single_slice = None):
         z_nodes = params['bins']['z_nodes'][single_slice:single_slice+2]
     m_nodes = params['bins']['m_nodes']
 
-    #if params['populations'] > 2:
-    #    cats.get_subpop_ids(z_nodes, m_nodes, params['populations'])
-    #    binned_ra_dec = cats.subset_positions(cats.subpop_ids)
-    #else:
-    #    cats.get_sf_qt_mass_redshift_bins(z_nodes,m_nodes)
-    #    binned_ra_dec = cats.subset_positions(cats.id_z_ms)
+    if params['galaxy_splitting_scheme'] == 'sf-qt':
+        cats.separate_sf_qt()
+        cats.get_sf_qt_mass_redshift_bins(z_nodes,m_nodes)
+        bin_ids = cats.id_z_ms
+    elif params['galaxy_splitting_scheme'] == '5pops':
+        Fcut = params['cuts']['fcut']
+        MIPS24_cut = params['cuts']['mips24_cut']
+        cats.separate_5pops(Fcut=Fcut,MIPS24_cut=MIPS24_cut)
+        cats.get_5pops_mass_redshift_bins(z_nodes,m_nodes)
+        bin_ids = cats.id_z_ms_5pop
+    elif params['galaxy_splitting_scheme'] == '4pops':
+        Fcut = params['cuts']['fcut']
+        age_cut = params['cuts']['age_cut']
+        cats.separate_4pops(Fcut=Fcut,age_cut=age_cut)
+        cats.get_4pops_mass_redshift_bins(z_nodes,m_nodes)
+        bin_ids = cats.id_z_ms_4pop
+    elif params['galaxy_splitting_scheme'] == 'uvj':
+        c_nodes = params['populations']['c_nodes']
+        c_names = params['populations']['pop_names']
+        cats.table['UVJ']=np.sqrt((cats.table['rf_U_V'] - np.min(cats.table['rf_U_V']))**2 + (cats.table['rf_V_J']-np.min(cats.table['rf_V_J'])) ** 2)
+        cats.separate_uvj_pops(c_nodes)
+        cats.get_mass_redshift_uvj_bins(z_nodes,m_nodes,c_names)
+        bin_ids = cats.id_z_ms_pop
+    elif params['galaxy_splitting_scheme'] == 'general':
+        cuts_dict = params['populations']
+        cats.separate_pops_by_name(cuts_dict)
+        cats.get_subpop_ids(z_nodes, m_nodes, cuts_dict)
+        bin_ids = cats.subpop_ids
+
+    return bin_ids
+
+def get_bin_radec(params, cats, single_slice = None):
+
+    if single_slice == None:
+        z_nodes = params['bins']['z_nodes']
+    else:
+        z_nodes = params['bins']['z_nodes'][single_slice:single_slice+2]
+    m_nodes = params['bins']['m_nodes']
 
     if params['galaxy_splitting_scheme'] == 'sf-qt':
         cats.separate_sf_qt()
@@ -222,7 +252,7 @@ def get_bin_radec(params, cats, single_slice = None):
     print z_nodes
     return binned_ra_dec
 
-def save_stacked_fluxes(stacked_fluxes, params, out_file_path, out_file_suffix):
+def save_stacked_fluxes(stacked_fluxes, params, IDs, out_file_path, out_file_suffix):
     fpath = "%s/%s_%s%s.p" % (out_file_path, params['io']['flux_densities_filename'],params['io']['shortname'],out_file_suffix)
     print 'pickling to '+fpath
     if not os.path.exists(out_file_path): os.makedirs(out_file_path)
@@ -230,7 +260,8 @@ def save_stacked_fluxes(stacked_fluxes, params, out_file_path, out_file_suffix):
     nodes = params['bins']
     #pdb.set_trace()
     #np.savez(fpath, stacked_fluxes=stacked_fluxes, nodes=nodes)
-    pickle.dump( [nodes, stacked_fluxes], open( fpath, "wb" ) )
+    #pickle.dump( [nodes, stacked_fluxes], open( fpath, "wb" ) )
+    pickle.dump( [IDs, stacked_fluxes], open( fpath, "wb" ) )
 
 def save_paramfile(params):
     fp_in    = params['io']['param_file_path']
