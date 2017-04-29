@@ -68,13 +68,13 @@ def main():
             stacked_flux_densities = {}
             if params['bootstrap'] == True:
                 print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
-                if params['index_boots'] == True:
-                    boot_indices_path = params['io']['output_folder']+'/bootstrapped_fluxes/bootstrap_indices/'
-                    boot_index_key = ''
-                    if not os.path.exists(boot_indices_path): os.makedirs(boot_indices_path)
-                else:
-                    boot_indices_path = False
-                    boot_index_key = None
+                #if params['index_boots'] == True:
+                #    boot_indices_path = params['io']['output_folder']+'/bootstrapped_fluxes/bootstrap_indices/'
+                #    boot_index_key = ''
+                #    if not os.path.exists(boot_indices_path): os.makedirs(boot_indices_path)
+                #else:
+                #    boot_indices_path = False
+                #    boot_index_key = None
                 # pcat is an instance of Bootstrap
                 # pcat.perturb_catalog with options encoded in parameter file
                 pcat.perturb_catalog(perturb_z = params['perturb_z'], boot_indices_path = boot_indices_path, boot_index_key = boot_index_key)
@@ -257,7 +257,7 @@ def save_stacked_fluxes(stacked_fluxes, params, IDs, out_file_path, out_file_suf
     print 'pickling to '+fpath
     if not os.path.exists(out_file_path): os.makedirs(out_file_path)
 
-    nodes = params['bins']
+    #nodes = params['bins']
     #pdb.set_trace()
     #np.savez(fpath, stacked_fluxes=stacked_fluxes, nodes=nodes)
     #pickle.dump( [nodes, stacked_fluxes], open( fpath, "wb" ) )
