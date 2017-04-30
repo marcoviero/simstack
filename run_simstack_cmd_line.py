@@ -77,7 +77,8 @@ def main():
                 #    boot_index_key = None
                 # pcat is an instance of Bootstrap
                 # pcat.perturb_catalog with options encoded in parameter file
-                pcat.perturb_catalog(perturb_z = params['perturb_z'],  boot_index_key = boot_index_key)
+                #pcat.perturb_catalog(perturb_z = params['perturb_z'], boot_indices_path = boot_indices_path, boot_index_key = boot_index_key)
+                pcat.perturb_catalog(perturb_z = params['perturb_z'])
                 bootcat = Field_catalogs(pcat.pseudo_cat)
                 binned_ra_dec = get_bin_radec(params, bootcat, single_slice = j)
                 bin_ids = get_bin_ids(params, bootcat, single_slice = j)
