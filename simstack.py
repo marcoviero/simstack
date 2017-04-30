@@ -48,6 +48,7 @@ class PickledStacksReader:
 		#self.bootstrap_error_array = {}
 		#self.bootstrap_error_dict = {}
 		#self.binsize_error_array  = {}
+		#self.bin_ids = {}
 		self.read_pickles()
 		if self.params['bootstrap'] == True:
 			ax = len(np.shape(self.bootstrap_flux_array)) - 1
@@ -81,6 +82,7 @@ class PickledStacksReader:
 					filename_boots = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '_boot_'+ str(k) + '.p'
 					if os.path.exists(self.path+filename_boots):
 						bootstack = pickle.load( open( self.path + filename_boots, "rb" ))
+						self.bin_ids = bootstack[0]
 						for wv in range(self.nw):
 							single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
 							for j in range(self.nm):
@@ -95,6 +97,8 @@ class PickledStacksReader:
 				filename_stacks = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '.p'
 				if os.path.exists(self.path+filename_stacks):
 					simstack = pickle.load( open( self.path + filename_stacks, "rb" ))
+					#pdb.set_trace()
+					self.bin_ids = simstack[0]
 					for wv in range(self.nw):
 						single_wv_stacks = simstack[1][z_slice][self.maps[wv]]
 						for j in range(self.nm):
