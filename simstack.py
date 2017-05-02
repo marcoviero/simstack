@@ -48,7 +48,7 @@ class PickledStacksReader:
 		#self.bootstrap_error_array = {}
 		#self.bootstrap_error_dict = {}
 		#self.binsize_error_array  = {}
-		#self.bin_ids = {}
+		self.bin_ids = {}
 		self.read_pickles()
 		if self.params['bootstrap'] == True:
 			ax = len(np.shape(self.bootstrap_flux_array)) - 1
@@ -82,7 +82,8 @@ class PickledStacksReader:
 					filename_boots = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '_boot_'+ str(k) + '.p'
 					if os.path.exists(self.path+filename_boots):
 						bootstack = pickle.load( open( self.path + filename_boots, "rb" ))
-						self.bin_ids = bootstack[0]
+						for bbk in bootstack[0]:
+							self.bin_ids[bbk+'_'+str(k)] = bootstack[0][bbk]
 						for wv in range(self.nw):
 							single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
 							for j in range(self.nm):
@@ -91,6 +92,8 @@ class PickledStacksReader:
 									p_suf = self.pops[p]
 									key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
 									bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key].value
+									#if wv ==0:
+									#	self.bin_ids[key+'_'+str(k)] = bootstack[0]
 
 				self.bootstrap_flux_array = bootstrap_fluxes
 			else:
@@ -98,7 +101,9 @@ class PickledStacksReader:
 				if os.path.exists(self.path+filename_stacks):
 					simstack = pickle.load( open( self.path + filename_stacks, "rb" ))
 					#pdb.set_trace()
-					self.bin_ids = simstack[0]
+					#self.bin_ids = simstack[0]
+					for ssk in simstack[0]:
+						self.bin_ids[ssk] = simstack[0][ssk]
 					for wv in range(self.nw):
 						single_wv_stacks = simstack[1][z_slice][self.maps[wv]]
 						for j in range(self.nm):
@@ -107,6 +112,9 @@ class PickledStacksReader:
 								p_suf = self.pops[p]
 								key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
 								stacked_fluxes[wv,i,j,p] = single_wv_stacks[key].value
+								#if wv ==0:
+								#	self.bin_ids[key] = simstack[0]
+								#	pdb.set_trace()
 
 				self.simstack_flux_array = stacked_fluxes
 
@@ -664,6 +672,8 @@ def stack_libraries_in_layers(
       arg = clean_args(lists[iarg])
       fit_params.add(arg,value= 1e-3*np.random.randn())
 
+
+    if len(ierr)==0: pdb.set_trace()
     cov_ss_1d = minimize(simultaneous_stack_array_oned, fit_params,
       args=(cfits_flat,), kws={'data1d':imap,'err1d':ierr}, nan_policy = 'propagate')
     del cfits_flat, imap, ierr
