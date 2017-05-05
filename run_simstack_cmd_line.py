@@ -65,7 +65,7 @@ def main():
 
         # Bootstrap Loop Starts here
         for iboot in np.arange(params['number_of_boots'])+params['boot0']:
-            stacked_flux_densities = {}
+            #stacked_flux_densities = {}
             if params['bootstrap'] == True:
                 print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
                 #if params['index_boots'] == True:
@@ -92,7 +92,8 @@ def main():
 
             # Do simultaneous stacking
             #pdb.set_trace()
-            stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
+            #stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
+            stacked_flux_densities = stack_libraries_in_layers(sky_library,binned_ra_dec)
 
             save_stacked_fluxes(stacked_flux_densities,params,bin_ids, out_file_path,out_file_suffix)
         #pdb.set_trace()
@@ -259,7 +260,7 @@ def save_stacked_fluxes(stacked_fluxes, params, IDs, out_file_path, out_file_suf
     if not os.path.exists(out_file_path): os.makedirs(out_file_path)
 
     #nodes = params['bins']
-    #pdb.set_trace()
+    pdb.set_trace()
     #np.savez(fpath, stacked_fluxes=stacked_fluxes, nodes=nodes)
     #pickle.dump( [nodes, stacked_fluxes], open( fpath, "wb" ) )
     pickle.dump( [IDs, stacked_fluxes], open( fpath, "wb" ) )
