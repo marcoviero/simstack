@@ -55,7 +55,12 @@ def main():
             stacked_flux_density_key = 'all_'+z_pref
         else:
             j = i
-            stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
+            #stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
+            if params['bins']['bin_in_lookback_time'] == True:
+                stacked_flux_density_key = '{:.3f}'.format(params['bins']['t_nodes'][j])+'-'+'{:.3f}'.format(params['bins']['t_nodes'][j+1])
+            else:
+                stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
+                
         print stacked_flux_density_key
         # From parameter file read maps, psfs, cats, and divide them into bins
         sky_library   = get_maps(params)
