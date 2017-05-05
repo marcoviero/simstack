@@ -332,6 +332,7 @@ class Field_catalogs:
 							(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
 
 					self.subpop_ids['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_'+k] = self.table.ID[ind_mz].values
+					#self.subpop_ids['z_'+clean_args('{:.3f}'.format(znodes[iz]))+'_'+clean_args('{:.3f}'.format(znodes[iz+1]))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_'+k] = self.table.ID[ind_mz].values
 
 	def get_sf_qt_mass_redshift_bins(self, znodes, mnodes):
 		self.id_z_ms = {}
