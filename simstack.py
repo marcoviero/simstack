@@ -86,7 +86,10 @@ class PickledStacksReader:
 						for bbk in bootstack[0]:
 							self.bin_ids[bbk+'_'+str(k)] = bootstack[0][bbk]
 						for wv in range(self.nw):
-							single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
+							try:
+								single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
+							except:
+								single_wv_stacks = bootstack[1][self.maps[wv]]
 							for j in range(self.nm):
 								m_suf = 'm_' + self.m_keys[j]
 								for p in range(self.npops):
@@ -107,7 +110,10 @@ class PickledStacksReader:
 					for ssk in simstack[0]:
 						self.bin_ids[ssk] = simstack[0][ssk]
 					for wv in range(self.nw):
-						single_wv_stacks = simstack[1][z_slice][self.maps[wv]]
+						try:
+							single_wv_stacks = simstack[1][z_slice][self.maps[wv]]
+						except:
+							single_wv_stacks = simstack[1][self.maps[wv]]
 						for j in range(self.nm):
 							m_suf = 'm_' + self.m_keys[j]
 							for p in range(self.npops):
