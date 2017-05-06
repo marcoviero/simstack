@@ -27,8 +27,10 @@ class PickledStacksReader:
 		self.params = self.get_parameters(config_path+config_file)
 		if self.params['bootstrap'] == True:
 			self.nboots = int(self.params['number_of_boots'])
-
-		indpop = np.argsort(np.array([i for i in self.params['populations'].values()]))
+		try:
+			indpop = np.argsort(np.array([i for i in self.params['populations'].values()]))
+		except:
+			indpop = np.argsort(np.array([i[0] for i in self.params['populations'].values()]))
 		self.pops = [self.params['populations'].keys()[i] for i in indpop]
 		self.npops = len(self.pops)
 		self.nz = len(self.params['bins']['z_nodes']) - 1
@@ -81,7 +83,7 @@ class PickledStacksReader:
 				for k in np.arange(self.nboots) + int(self.params['boot0']):
 					filename_boots = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '_boot_'+ str(k) + '.p'
 					if os.path.exists(self.path+filename_boots):
-						pdb.set_trace()
+						#pdb.set_trace()
 						bootstack = pickle.load( open( self.path + filename_boots, "rb" ))
 						for bbk in bootstack[0]:
 							self.bin_ids[bbk+'_'+str(k)] = bootstack[0][bbk]

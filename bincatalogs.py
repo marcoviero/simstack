@@ -124,19 +124,19 @@ class Field_catalogs:
 				icut = reverse_ind[j]
 				ckey = conditions[icut][0]
 				if (conditions[icut][1] == False) & (conditions[icut][2] == False):
-					if (self.table[ckey][i] == conditions[icut][3]):
+					if (self.table[ckey].values[i] == conditions[icut][3]):
 						sfg[i]=ind[icut]
 						continue
 				elif conditions[icut][1] == False:
-					if (self.table[ckey][i] < conditions[icut][2]):
+					if (self.table[ckey].values[i] < conditions[icut][2]):
 						sfg[i]=ind[icut]
 						continue
 				elif conditions[icut][2] == False:
-					if (self.table[ckey][i] > conditions[icut][1]):
+					if (self.table[ckey].values[i] > conditions[icut][1]):
 						sfg[i]=ind[icut]
 						continue
 				else:
-					if (self.table[ckey][i] > conditions[icut][1]) & (self.table[ckey][i] < conditions[icut][2]):
+					if (self.table[ckey].values[i] > conditions[icut][1]) & (self.table[ckey].values[i] < conditions[icut][2]):
 						sfg[i]=ind[icut]
 						continue
 			# If no condition yet met then see if it's Quiescent
