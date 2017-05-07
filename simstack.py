@@ -27,8 +27,10 @@ class PickledStacksReader:
 		self.params = self.get_parameters(config_path+config_file)
 		if self.params['bootstrap'] == True:
 			self.nboots = int(self.params['number_of_boots'])
-
-		indpop = np.argsort(np.array([i for i in self.params['populations'].values()]))
+		try:
+			indpop = np.argsort(np.array([i for i in self.params['populations'].values()]))
+		except:
+			indpop = np.argsort(np.array([i[0] for i in self.params['populations'].values()]))
 		self.pops = [self.params['populations'].keys()[i] for i in indpop]
 		self.npops = len(self.pops)
 		self.nz = len(self.params['bins']['z_nodes']) - 1
@@ -81,16 +83,21 @@ class PickledStacksReader:
 				for k in np.arange(self.nboots) + int(self.params['boot0']):
 					filename_boots = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '_boot_'+ str(k) + '.p'
 					if os.path.exists(self.path+filename_boots):
+						#pdb.set_trace()
 						bootstack = pickle.load( open( self.path + filename_boots, "rb" ))
 						for bbk in bootstack[0]:
 							self.bin_ids[bbk+'_'+str(k)] = bootstack[0][bbk]
 						for wv in range(self.nw):
-							single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
+							try:
+								single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
+							except:
+								single_wv_stacks = bootstack[1][self.maps[wv]]
 							for j in range(self.nm):
 								m_suf = 'm_' + self.m_keys[j]
 								for p in range(self.npops):
 									p_suf = self.pops[p]
 									key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
+									#pdb.set_trace()
 									bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key].value
 									#if wv ==0:
 									#	self.bin_ids[key+'_'+str(k)] = bootstack[0]
@@ -105,7 +112,10 @@ class PickledStacksReader:
 					for ssk in simstack[0]:
 						self.bin_ids[ssk] = simstack[0][ssk]
 					for wv in range(self.nw):
-						single_wv_stacks = simstack[1][z_slice][self.maps[wv]]
+						try:
+							single_wv_stacks = simstack[1][z_slice][self.maps[wv]]
+						except:
+							single_wv_stacks = simstack[1][self.maps[wv]]
 						for j in range(self.nm):
 							m_suf = 'm_' + self.m_keys[j]
 							for p in range(self.npops):
@@ -140,6 +150,17 @@ class PickledStacksReader:
 		for i in range(self.nz):
 			if self.params['bins']['bin_in_lookback_time']:
 				z_suf.append('{:.3f}'.format(self.params['bins']['z_nodes'][i]) +'-'+ '{:.3f}'.format(self.params['bins']['z_nodes'][i+1]))
+				clean_args(str(round(self.params['bins']['z_nodes'][i],3)))+'_'+clean_args(str(round(self.params['bins']['z_nodes'][i+1],3)))
+				#if ('{:.3f}'.format(self.params['bins']['z_nodes'][i])[-1] == '0'):
+				#	z1 = '{:.2f}'.format(self.params['bins']['z_nodes'][i])
+				#else:
+				#	z1 = '{:.3f}'.format(self.params['bins']['z_nodes'][i])
+
+				#if ('{:.3f}'.format(self.params['bins']['z_nodes'][i+1])[-1] == '0'):
+				#	z2 = '{:.2f}'.format(self.params['bins']['z_nodes'][i+1])
+				#else:
+				#	z2 = '{:.3f}'.format(self.params['bins']['z_nodes'][i+1])
+				#z_suf.append(z1+'-'+z2)
 			else:
 				z_suf.append(str(self.params['bins']['z_nodes'][i])+'-'+str(self.params['bins']['z_nodes'][i+1]))
 

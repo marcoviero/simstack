@@ -55,7 +55,17 @@ def main():
             stacked_flux_density_key = 'all_'+z_pref
         else:
             j = i
-            stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
+            #stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
+            #if params['bins']['bin_in_lookback_time'] == True:
+            #    stacked_flux_density_key = '{:.3f}'.format(params['bins']['t_nodes'][j])+'-'+'{:.3f}'.format(params['bins']['t_nodes'][j+1])
+            #else:
+            #    stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
+            #stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
+            if params['bins']['bin_in_lookback_time'] == True:
+                stacked_flux_density_key = '{:.3f}'.format(params['bins']['t_nodes'][j])+'-'+'{:.3f}'.format(params['bins']['t_nodes'][j+1])
+            else:
+                stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
+
         print stacked_flux_density_key
         # From parameter file read maps, psfs, cats, and divide them into bins
         sky_library   = get_maps(params)
@@ -65,7 +75,7 @@ def main():
 
         # Bootstrap Loop Starts here
         for iboot in np.arange(params['number_of_boots'])+params['boot0']:
-            stacked_flux_densities = {}
+            #stacked_flux_densities = {}
             if params['bootstrap'] == True:
                 print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
                 #if params['index_boots'] == True:
@@ -92,7 +102,8 @@ def main():
 
             # Do simultaneous stacking
             #pdb.set_trace()
-            stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
+            #stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
+            stacked_flux_densities = stack_libraries_in_layers(sky_library,binned_ra_dec)
 
             save_stacked_fluxes(stacked_flux_densities,params,bin_ids, out_file_path,out_file_suffix)
         #pdb.set_trace()
