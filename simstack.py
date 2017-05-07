@@ -29,12 +29,15 @@ class PickledStacksReader:
 			self.nboots = int(self.params['number_of_boots'])
 		try:
 			try:
-				indpop = np.argsort(np.array([i for i in self.params['populations']['pop_names'].values()]))
+				indpop = np.argsort(np.array([i for i in self.params['populations']['pop_names']]))
 			except:
 				indpop = np.argsort(np.array([i for i in self.params['populations'].values()]))
 		except:
 			indpop = np.argsort(np.array([i[0] for i in self.params['populations'].values()]))
-		self.pops = [self.params['populations'].keys()[i] for i in indpop]
+		try:
+			self.pops = [self.params['populations']['pop_names'][i] for i in indpop]
+		except:
+			self.pops = [self.params['populations'].keys()[i] for i in indpop]
 		self.npops = len(self.pops)
 		self.nz = len(self.params['bins']['z_nodes']) - 1
 		self.nm = len(self.params['bins']['m_nodes']) - 1
