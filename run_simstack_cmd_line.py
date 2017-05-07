@@ -273,7 +273,7 @@ def save_stacked_fluxes(stacked_fluxes, params, IDs, out_file_path, out_file_suf
     #pdb.set_trace()
     #np.savez(fpath, stacked_fluxes=stacked_fluxes, nodes=nodes)
     #pickle.dump( [nodes, stacked_fluxes], open( fpath, "wb" ) )
-    pickle.dump( [IDs, stacked_fluxes], open( fpath, "wb" ) )
+    pickle.dump( [IDs, stacked_fluxes], open( fpath, "wb" ), protocol=2 )
 
 def save_paramfile(params):
     fp_in    = params['io']['param_file_path']
