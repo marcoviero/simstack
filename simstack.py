@@ -111,7 +111,6 @@ class PickledStacksReader:
 								for p in range(self.npops):
 									p_suf = self.pops[p]
 									key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
-									pdb.set_trace()
 									try:
 										bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key].value
 										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key].stderr
