@@ -104,7 +104,7 @@ class PickledStacksReader:
 									p_suf = self.pops[p]
 									key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
 									#pdb.set_trace()
-									bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key].value
+									bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key][value]
 									#if wv ==0:
 									#	self.bin_ids[key+'_'+str(k)] = bootstack[0]
 
@@ -127,12 +127,14 @@ class PickledStacksReader:
 							for p in range(self.npops):
 								p_suf = self.pops[p]
 								key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
-								stacked_fluxes[wv,i,j,p] = single_wv_stacks[key].value
+								stacked_fluxes[wv,i,j,p] = single_wv_stacks[key][value]
+								stacked_errors[wv,i,j,p] = single_wv_stacks[key][stderr]
 								#if wv ==0:
 								#	self.bin_ids[key] = simstack[0]
 								#	pdb.set_trace()
 
 				self.simstack_flux_array = stacked_fluxes
+				self.simstack_error_array = stacked_fluxes
 
 	def is_bootstrap(self,config):
 		return config['bootstrap']
