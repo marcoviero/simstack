@@ -92,7 +92,7 @@ def get_general_params(raw_params):
     except KeyError:
         params['galaxy_splitting_scheme'] = 'sf-qt'
     try:
-        params['save_bin_ids'] = raw_params['save_bin_ids']
+        params['save_bin_ids'] = string_is_true(raw_params['save_bin_ids'])
     except:
         params['save_bin_ids'] = True
 
