@@ -26,6 +26,7 @@ from utils import shift_twod
 from utils import smooth_psf
 from lmfit import Parameters, minimize, fit_report
 from simstack import stack_libraries_in_layers
+from simstack import is_true 
 from bootstrap import Bootstrap
 
 def main():
@@ -295,24 +296,6 @@ def save_paramfile(params):
     logging.info("")
 
     shutil.copyfile(fp_in, fp_out)
-
-def is_true(raw_params, key):
-    """Is raw_params[key] true? Returns boolean value.
-    """
-    sraw    = raw_params[key]
-    s       = sraw.lower() # Make case-insensitive
-
-    # Lists of acceptable 'True' and 'False' strings
-    true_strings    = ['true', 't', 'yes', 'y', '1']
-    false_strings    = ['false', 'f', 'no', 'n', '0']
-    if s in true_strings:
-        return True
-    elif s in false_strings:
-        return False
-    else:
-        logging.warning("Input not recognized for parameter: %s" % (key))
-        logging.warning("You provided: %s" % (sraw))
-        raise
 
 if __name__=="__main__":
     main()
