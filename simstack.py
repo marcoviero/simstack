@@ -47,7 +47,7 @@ class PickledStacksReader:
 		self.wvs = [self.params['wavelength'].values()[i] for i in self.ind]
 		self.z_nodes = self.params['bins']['z_nodes']
 		self.m_nodes = self.params['bins']['m_nodes']
-		z_m_keys = self.m_z_key_builder()
+		z_m_keys = self.m_z_key_builder(ndecimal=1)
 		self.z_keys = z_m_keys[0]
 		self.m_keys = z_m_keys[1]
 		self.slice_keys = self.slice_key_builder()
@@ -82,7 +82,7 @@ class PickledStacksReader:
 		else:
 			stacked_fluxes = np.zeros([self.nw,self.nz,self.nm,self.npops])
 			stacked_errors = np.zeros([self.nw,self.nz,self.nm,self.npops])
-		slice_keys = self.slice_key_builder()
+		slice_keys = self.slice_key_builder(ndecimal=1)
 
 		for i in range(self.nz):
 			z_slice = slice_keys[i]
@@ -93,7 +93,7 @@ class PickledStacksReader:
 					if os.path.exists(self.path+filename_boots):
 						bootstack = pickle.load( open( self.path + filename_boots, "rb" ))
 						if self.params['save_bin_ids'] == True:
-							for bbk in bootstack[0]:
+							for bbk in bootstack[0].keys():
 								self.bin_ids[bbk+'_'+str(k)] = bootstack[0][bbk]
 						for wv in range(self.nw):
 							if self.params['save_bin_ids'] == True:
@@ -111,9 +111,12 @@ class PickledStacksReader:
 								for p in range(self.npops):
 									p_suf = self.pops[p]
 									key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
-									#pdb.set_trace()
-									bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key]['value']
-									bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key]['stderr']
+									try:
+										bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key].value
+										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key].stderr
+									except:
+										bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key]['value']
+										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key]['stderr']
 
 				self.bootstrap_flux_array = bootstrap_fluxes
 				self.bootstrap_error_array = bootstrap_fluxes
@@ -134,8 +137,12 @@ class PickledStacksReader:
 							for p in range(self.npops):
 								p_suf = self.pops[p]
 								key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
-								stacked_fluxes[wv,i,j,p] = single_wv_stacks[key]['value']
-								stacked_errors[wv,i,j,p] = single_wv_stacks[key]['stderr']
+								try:
+									stacked_fluxes[wv,i,j,p] = single_wv_stacks[key].value
+									stacked_errors[wv,i,j,p] = single_wv_stacks[key].stderr
+								except:
+									stacked_fluxes[wv,i,j,p] = single_wv_stacks[key]['value']
+									stacked_errors[wv,i,j,p] = single_wv_stacks[key]['stderr']
 
 				self.simstack_flux_array = stacked_fluxes
 				self.simstack_error_array = stacked_fluxes
@@ -143,7 +150,9 @@ class PickledStacksReader:
 	def is_bootstrap(self,config):
 		return config['bootstrap']
 
-	def slice_key_builder(self):
+	def slice_key_builder(self, ndecimal = 2):
+
+		decimal_suf = '{:.'+str(ndecimal)+'f}'
 
 		if self.params['bins']['bin_in_lookback_time']:
 			z_nodes = self.params['bins']['t_nodes']
@@ -152,24 +161,20 @@ class PickledStacksReader:
 		nz = len(z_nodes) - 1
 
 		#return [str(z_nodes[i])+ '-' +str(z_nodes[i+1]) for i in range(nz)]
-		return [str('{:.2f}'.format(z_nodes[i]))+ '-' +str('{:.2f}'.format(z_nodes[i+1])) for i in range(nz)]
+		return [str(decimal_suf.format(z_nodes[i]))+ '-' +str(decimal_suf.format(z_nodes[i+1])) for i in range(nz)]
 
-	def m_z_key_builder(self):
+	def m_z_key_builder(self, ndecimal = 2):
 
 		z_suf = []
 		m_suf = []
 
+		decimal_suf = '{:.'+str(ndecimal)+'f}'
+
 		for i in range(self.nz):
-			z_suf.append('{:.2f}'.format(self.params['bins']['z_nodes'][i]) +'-'+ '{:.2f}'.format(self.params['bins']['z_nodes'][i+1]))
-			#if self.params['bins']['bin_in_lookback_time']:
-			#	z_suf.append('{:.2f}'.format(self.params['bins']['z_nodes'][i]) +'-'+ '{:.2f}'.format(self.params['bins']['z_nodes'][i+1]))
-			#	clean_args(str(round(self.params['bins']['z_nodes'][i],3)))+'_'+clean_args(str(round(self.params['bins']['z_nodes'][i+1],3)))
-			#else:
-			#	z_suf.append(str(self.params['bins']['z_nodes'][i])+'-'+str(self.params['bins']['z_nodes'][i+1]))
+			z_suf.append(decimal_suf.format(self.params['bins']['z_nodes'][i]) +'-'+ decimal_suf.format(self.params['bins']['z_nodes'][i+1]))
 
 		for j in range(self.nm):
-			m_suf.append('{:.2f}'.format(self.params['bins']['m_nodes'][j]) +'-'+ '{:.2f}'.format(self.params['bins']['m_nodes'][j+1]))
-			#m_suf.append(str(self.params['bins']['m_nodes'][j])+'-'+str(self.params['bins']['m_nodes'][j+1]))
+			m_suf.append(decimal_suf.format(self.params['bins']['m_nodes'][j]) +'-'+ decimal_suf.format(self.params['bins']['m_nodes'][j+1]))
 
 		return [z_suf, m_suf]
 
