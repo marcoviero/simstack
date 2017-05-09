@@ -331,8 +331,8 @@ class Field_catalogs:
 						ind_mz =( (self.table.sfg == pop_dict[k][0]) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 							(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
 
-					self.subpop_ids['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_'+k] = self.table.ID[ind_mz].values
-					#self.subpop_ids['z_'+clean_args('{:.3f}'.format(znodes[iz]))+'_'+clean_args('{:.3f}'.format(znodes[iz+1]))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_'+k] = self.table.ID[ind_mz].values
+					self.subpop_ids['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_'+k] = self.table.ID[ind_mz].values
+					#self.subpop_ids['z_'+clean_args('{:.3f}'.format(znodes[iz]))+'_'+clean_args('{:.3f}'.format(znodes[iz+1]))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_'+k] = self.table.ID[ind_mz].values
 
 	def get_sf_qt_mass_redshift_bins(self, znodes, mnodes):
 		self.id_z_ms = {}
@@ -343,8 +343,8 @@ class Field_catalogs:
 				ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
 
-				self.id_z_ms['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sf'] = self.table.ID[ind_mz_sf].values
-				self.id_z_ms['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_qt'] = self.table.ID[ind_mz_qt].values
+				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
+				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
 
 	def get_sf_qt_mass_lookback_time_bins(self, tnodes, mnodes):
 		self.id_lookt_mass = {}
@@ -358,8 +358,8 @@ class Field_catalogs:
 				ind_mt_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
 
-				self.id_lookt_mass['lookt_'+clean_args(str(round(tnodes[iz],3)))+'_'+clean_args(str(round(tnodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sf'] = self.table.ID[ind_mt_sf].values
-				self.id_lookt_mass['lookt_'+clean_args(str(round(tnodes[iz],3)))+'_'+clean_args(str(round(tnodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_qt'] = self.table.ID[ind_mt_qt].values
+				self.id_lookt_mass['lookt_'+clean_args(str('{:.2f}'.format(tnodes[iz])))+'_'+clean_args(str('{:.2f}'.format(tnodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mt_sf].values
+				self.id_lookt_mass['lookt_'+clean_args(str('{:.2f}'.format(tnodes[iz])))+'_'+clean_args(str('{:.2f}'.format(tnodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mt_qt].values
 
 	def get_sf_qt_agn_mass_redshift_bins(self, znodes, mnodes):
 		self.id_z_ms = {}
@@ -372,9 +372,9 @@ class Field_catalogs:
 				ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
 
-				self.id_z_ms['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sf'] = self.table.ID[ind_mz_sf].values
-				self.id_z_ms['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_qt'] = self.table.ID[ind_mz_qt].values
-				self.id_z_ms['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_agn'] = self.table.ID[ind_mz_agn].values
+				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
+				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
+				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_agn'] = self.table.ID[ind_mz_agn].values
 
 	def get_mass_redshift_uvj_bins(self, znodes, mnodes, cnodes, linear_mass=1):
 		#pop_suf = ['qt','sf0','sf1','sf2','sf3']
@@ -391,7 +391,7 @@ class Field_catalogs:
 
 					if kc < len(cnodes)-1: csuf = 'sf'+str(kc)
 					else: csuf = 'qt'
-					self.id_z_ms_pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_'+csuf] = self.table.ID[ind_mz].values
+					self.id_z_ms_pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_'+csuf] = self.table.ID[ind_mz].values
 
 	def get_3pops_mass_redshift_bins(self, znodes, mnodes, linear_mass=1):
 		#pop_suf = ['sf','qt','agn']
@@ -413,9 +413,9 @@ class Field_catalogs:
 					ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
 
-				self.id_z_ms_3pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sf'] = self.table.ID[ind_mz_sf].values
-				self.id_z_ms_3pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_qt'] = self.table.ID[ind_mz_qt].values
-				self.id_z_ms_3pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_agn'] = self.table.ID[ind_mz_agn].values
+				self.id_z_ms_3pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
+				self.id_z_ms_3pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
+				self.id_z_ms_3pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_agn'] = self.table.ID[ind_mz_agn].values
 
 	def get_3pops_mass_redshift_bins_sb(self, znodes, mnodes, linear_mass=1):
 		#pop_suf = ['sf','qt','sb']
@@ -437,9 +437,9 @@ class Field_catalogs:
 					ind_mz_sb =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
 
-				self.id_z_ms_3pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sf'] = self.table.ID[ind_mz_sf].values
-				self.id_z_ms_3pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_qt'] = self.table.ID[ind_mz_qt].values
-				self.id_z_ms_3pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sb'] = self.table.ID[ind_mz_sb].values
+				self.id_z_ms_3pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
+				self.id_z_ms_3pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
+				self.id_z_ms_3pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sb'] = self.table.ID[ind_mz_sb].values
 
 	def get_4pops_mass_redshift_bins(self, znodes, mnodes, linear_mass=1):
 		#pop_suf = ['sf','qt','agn','sb']
@@ -465,10 +465,10 @@ class Field_catalogs:
 					ind_mz_sb =( (self.table.sfg == 3) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
 
-				self.id_z_ms_4pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sf'] = self.table.ID[ind_mz_sf].values
-				self.id_z_ms_4pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_qt'] = self.table.ID[ind_mz_qt].values
-				self.id_z_ms_4pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_agn'] = self.table.ID[ind_mz_agn].values
-				self.id_z_ms_4pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sb'] = self.table.ID[ind_mz_sb].values
+				self.id_z_ms_4pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
+				self.id_z_ms_4pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
+				self.id_z_ms_4pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_agn'] = self.table.ID[ind_mz_agn].values
+				self.id_z_ms_4pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sb'] = self.table.ID[ind_mz_sb].values
 
 	def get_5pops_mass_redshift_bins(self, znodes, mnodes, linear_mass=1):
 		#pop_suf = ['sf','qt','agn','sb','loc']
@@ -498,11 +498,11 @@ class Field_catalogs:
 					ind_mz_loc=( (self.table.sfg == 3) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
 
-				self.id_z_ms_5pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sf'] = self.table.ID[ind_mz_sf].values
-				self.id_z_ms_5pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_qt'] = self.table.ID[ind_mz_qt].values
-				self.id_z_ms_5pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_agn'] = self.table.ID[ind_mz_agn].values
-				self.id_z_ms_5pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sb'] = self.table.ID[ind_mz_sb].values
-				self.id_z_ms_5pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_loc'] = self.table.ID[ind_mz_loc].values
+				self.id_z_ms_5pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
+				self.id_z_ms_5pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
+				self.id_z_ms_5pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_agn'] = self.table.ID[ind_mz_agn].values
+				self.id_z_ms_5pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sb'] = self.table.ID[ind_mz_sb].values
+				self.id_z_ms_5pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_loc'] = self.table.ID[ind_mz_loc].values
 
 	def get_6pops_mass_redshift_bins(self, znodes, mnodes, linear_mass=1):
 		#pop_suf = ['qt',sf','agn','dst',sb','loc']
@@ -536,12 +536,12 @@ class Field_catalogs:
 					ind_mz_loc=( (self.table.sfg == 5) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
 
-				self.id_z_ms_6pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sf'] = self.table.ID[ind_mz_sf].values
-				self.id_z_ms_6pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_qt'] = self.table.ID[ind_mz_qt].values
-				self.id_z_ms_6pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_agn'] = self.table.ID[ind_mz_agn].values
-				self.id_z_ms_6pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_dst'] = self.table.ID[ind_mz_dst].values
-				self.id_z_ms_6pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_sb'] = self.table.ID[ind_mz_sb].values
-				self.id_z_ms_6pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+'_loc'] = self.table.ID[ind_mz_loc].values
+				self.id_z_ms_6pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
+				self.id_z_ms_6pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
+				self.id_z_ms_6pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_agn'] = self.table.ID[ind_mz_agn].values
+				self.id_z_ms_6pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_dst'] = self.table.ID[ind_mz_dst].values
+				self.id_z_ms_6pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sb'] = self.table.ID[ind_mz_sb].values
+				self.id_z_ms_6pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_loc'] = self.table.ID[ind_mz_loc].values
 
 	def get_general_redshift_bins(self, znodes, mnodes, sfg = 1, suffx = '', Fcut = 25, Ahat = 1.0, initialize_pop = False):
 		if initialize_pop == True: self.id_z_ms = {}
@@ -550,7 +550,7 @@ class Field_catalogs:
 				ind_mz =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
 
-				self.id_z_ms['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+suffx] = self.table.ID[ind_mz].values
+				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+suffx] = self.table.ID[ind_mz].values
 
 	def get_mass_redshift_bins(self, znodes, mnodes, sfg = 1, pop_suffix = '', initialize_pop = False):
 		if initialize_pop == True: self.id_z_ms_pop = {}
@@ -559,7 +559,7 @@ class Field_catalogs:
 				ind_mz =( (self.table.sfg == sfg) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
 					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
 
-				self.id_z_ms_pop['z_'+clean_args(str(round(znodes[iz],3)))+'_'+clean_args(str(round(znodes[iz+1],3)))+'__m_'+clean_args(str(round(mnodes[jm],3)))+'_'+clean_args(str(round(mnodes[jm+1],3)))+pop_suffix] = self.table.ID[ind_mz].values
+				self.id_z_ms_pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+pop_suffix] = self.table.ID[ind_mz].values
 
 	def get_criteria_specific_redshift_bins(self, znodes, mnodes, sfg = 1, criteria = '', crange = [1.0], initialize_pop = False):
 		pop = ['qt','sf']
@@ -574,7 +574,7 @@ class Field_catalogs:
 							(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) &
 							(clean_nans(self.table[criteria]) >= crange[kc]) & (clean_nans(self.table[criteria]) < crange[kc+1]) )
 
-						arg = 'z_'+str(round(znodes[iz],3))+'_'+str(round(znodes[iz+1],3))+'__m_'+str(round(mnodes[jm],3))+'_'+str(round(mnodes[jm+1],3))+'__'+criteria+'_'+str(round(crange[kc],2))+'_'+str(round(crange[kc+1],2))+'_'+pop[sfg]
+						arg = 'z_'+str('{:.2f}'.format(znodes[iz]))+'_'+str('{:.2f}'.format(znodes[iz+1]))+'__m_'+str('{:.2f}'.format(mnodes[jm]))+'_'+str('{:.2f}'.format(mnodes[jm+1]))+'__'+criteria+'_'+str('{:.2f}'.format(crange[kc],2))+'_'+str('{:.2f}'.format(crange[kc+1],2))+'_'+pop[sfg]
 						self.id_crit[clean_args(arg)] = self.table.ID[ind_crit].values
 				else:
 					#above and below no?
@@ -585,9 +585,9 @@ class Field_catalogs:
 						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) &
 						(clean_nans(self.table[criteria]) < crange[0]) )
 
-					arg = 'z_'+str(round(znodes[iz],3))+'_'+str(round(znodes[iz+1],3))+'__m_'+str(round(mnodes[jm],3))+'_'+str(round(mnodes[jm+1],3))+'__'+criteria+'_ge_'+str(round(crange[0],2))+'_'+pop[sfg]
+					arg = 'z_'+str('{:.2f}'.format(znodes[iz]))+'_'+str('{:.2f}'.format(znodes[iz+1]))+'__m_'+str('{:.2f}'.format(mnodes[jm]))+'_'+str('{:.2f}'.format(mnodes[jm+1]))+'__'+criteria+'_ge_'+str('{:.2f}'.format(crange[0],2))+'_'+pop[sfg]
 					self.id_crit[clean_args(arg)] = self.table.ID[ind_above].values
-					arg = 'z_'+str(round(znodes[iz],3))+'_'+str(round(znodes[iz+1],3))+'__m_'+str(round(mnodes[jm],3))+'_'+str(round(mnodes[jm+1],3))+'__'+criteria+'_lt_'+str(round(crange[0],2))+'_'+pop[sfg]
+					arg = 'z_'+str('{:.2f}'.format(znodes[iz]))+'_'+str('{:.2f}'.format(znodes[iz+1]))+'__m_'+str('{:.2f}'.format(mnodes[jm]))+'_'+str('{:.2f}'.format(mnodes[jm+1]))+'__'+criteria+'_lt_'+str('{:.2f}'.format(crange[0],2))+'_'+pop[sfg]
 					self.id_crit[clean_args(arg)] = self.table.ID[ind_below].values
 
 

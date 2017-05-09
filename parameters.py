@@ -8,7 +8,7 @@ import astropy.cosmology as ac
 from astropy.cosmology import Planck15 as cosmo
 from astropy.cosmology import Planck15, z_at_value
 import astropy.units as u
-import NDpredict
+#import NDpredict
 from utils import string_is_true
 #from astropy.cosmology import Planck15 as cosmo
 
@@ -91,6 +91,10 @@ def get_general_params(raw_params):
         params['galaxy_splitting_scheme'] = raw_params['classification_scheme']
     except KeyError:
         params['galaxy_splitting_scheme'] = 'sf-qt'
+    try:
+        params['save_bin_ids'] = string_is_true(raw_params['save_bin_ids'])
+    except:
+        params['save_bin_ids'] = True
 
     # If running bootstrap
     if string_is_true(raw_params['bootstrap'].split()[0]) == True:

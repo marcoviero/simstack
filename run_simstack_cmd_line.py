@@ -26,6 +26,7 @@ from utils import shift_twod
 from utils import smooth_psf
 from lmfit import Parameters, minimize, fit_report
 from simstack import stack_libraries_in_layers
+from simstack import is_true 
 from bootstrap import Bootstrap
 
 def main():
@@ -62,7 +63,7 @@ def main():
             #    stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
             #stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
             if params['bins']['bin_in_lookback_time'] == True:
-                stacked_flux_density_key = '{:.3f}'.format(params['bins']['t_nodes'][j])+'-'+'{:.3f}'.format(params['bins']['t_nodes'][j+1])
+                stacked_flux_density_key = '{:.2f}'.format(params['bins']['t_nodes'][j])+'-'+'{:.2f}'.format(params['bins']['t_nodes'][j+1])
             else:
                 stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
 
@@ -91,12 +92,18 @@ def main():
                 pcat.perturb_catalog(perturb_z = params['perturb_z'])
                 bootcat = Field_catalogs(pcat.pseudo_cat)
                 binned_ra_dec = get_bin_radec(params, bootcat, single_slice = j)
-                bin_ids = get_bin_ids(params, bootcat, single_slice = j)
+                if params['save_bin_ids'] == False:
+                    bin_ids = None
+                else:
+                    bin_ids = get_bin_ids(params, bootcat, single_slice = j)
                 out_file_path   = params['io']['output_folder']+'/bootstrapped_fluxes/'+params['io']['shortname']
                 out_file_suffix = '_'+stacked_flux_density_key+'_boot_'+str(int(iboot))
             else:
                 binned_ra_dec = get_bin_radec(params, cats, single_slice = j)
-                bin_ids = get_bin_ids(params, cats, single_slice = j)
+                if params['save_bin_ids'] == False:
+                    bin_ids = None
+                else:
+                    bin_ids = get_bin_ids(params, cats, single_slice = j)
                 out_file_path   = params['io']['output_folder'] + '/simstack_fluxes/' + params['io']['shortname']
                 out_file_suffix = '_'+stacked_flux_density_key
 
@@ -105,7 +112,7 @@ def main():
             #stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
             stacked_flux_densities = stack_libraries_in_layers(sky_library,binned_ra_dec)
 
-            save_stacked_fluxes(stacked_flux_densities,params,bin_ids, out_file_path,out_file_suffix)
+            save_stacked_fluxes(stacked_flux_densities,params, out_file_path,out_file_suffix, IDs=bin_ids)
         #pdb.set_trace()
 
     #Save Parameter file in folder
@@ -264,16 +271,15 @@ def get_bin_radec(params, cats, single_slice = None):
     print z_nodes
     return binned_ra_dec
 
-def save_stacked_fluxes(stacked_fluxes, params, IDs, out_file_path, out_file_suffix):
+def save_stacked_fluxes(stacked_fluxes, params, out_file_path, out_file_suffix, IDs=None):
     fpath = "%s/%s_%s%s.p" % (out_file_path, params['io']['flux_densities_filename'],params['io']['shortname'],out_file_suffix)
     print 'pickling to '+fpath
     if not os.path.exists(out_file_path): os.makedirs(out_file_path)
 
-    #nodes = params['bins']
-    #pdb.set_trace()
-    #np.savez(fpath, stacked_fluxes=stacked_fluxes, nodes=nodes)
-    #pickle.dump( [nodes, stacked_fluxes], open( fpath, "wb" ) )
-    pickle.dump( [IDs, stacked_fluxes], open( fpath, "wb" ), protocol=2 )
+    if IDs == None:
+        pickle.dump( stacked_fluxes, open( fpath, "wb" )) #, protocol=2 )
+    else:
+        pickle.dump( [IDs, stacked_fluxes], open( fpath, "wb" )) #, protocol=2 )
 
 def save_paramfile(params):
     fp_in    = params['io']['param_file_path']
@@ -290,24 +296,6 @@ def save_paramfile(params):
     logging.info("")
 
     shutil.copyfile(fp_in, fp_out)
-
-def is_true(raw_params, key):
-    """Is raw_params[key] true? Returns boolean value.
-    """
-    sraw    = raw_params[key]
-    s       = sraw.lower() # Make case-insensitive
-
-    # Lists of acceptable 'True' and 'False' strings
-    true_strings    = ['true', 't', 'yes', 'y', '1']
-    false_strings    = ['false', 'f', 'no', 'n', '0']
-    if s in true_strings:
-        return True
-    elif s in false_strings:
-        return False
-    else:
-        logging.warning("Input not recognized for parameter: %s" % (key))
-        logging.warning("You provided: %s" % (sraw))
-        raise
 
 if __name__=="__main__":
     main()
