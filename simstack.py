@@ -91,13 +91,20 @@ class PickledStacksReader:
 					if os.path.exists(self.path+filename_boots):
 						#pdb.set_trace()
 						bootstack = pickle.load( open( self.path + filename_boots, "rb" ))
-						for bbk in bootstack[0]:
-							self.bin_ids[bbk+'_'+str(k)] = bootstack[0][bbk]
+						if params['save_bin_ids'] == True:
+							for bbk in bootstack[0]:
+								self.bin_ids[bbk+'_'+str(k)] = bootstack[0][bbk]
 						for wv in range(self.nw):
-							try:
-								single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
-							except:
-								single_wv_stacks = bootstack[1][self.maps[wv]]
+							if params['save_bin_ids'] == True:
+								try:
+									single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
+								except:
+									single_wv_stacks = bootstack[1][self.maps[wv]]
+							else:
+								try:
+									single_wv_stacks = bootstack[z_slice][self.maps[wv]]
+								except:
+									single_wv_stacks = bootstack[self.maps[wv]]
 							for j in range(self.nm):
 								m_suf = 'm_' + self.m_keys[j]
 								for p in range(self.npops):
@@ -105,8 +112,6 @@ class PickledStacksReader:
 									key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
 									#pdb.set_trace()
 									bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key][value]
-									#if wv ==0:
-									#	self.bin_ids[key+'_'+str(k)] = bootstack[0]
 
 				self.bootstrap_flux_array = bootstrap_fluxes
 			else:
@@ -129,9 +134,6 @@ class PickledStacksReader:
 								key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
 								stacked_fluxes[wv,i,j,p] = single_wv_stacks[key][value]
 								stacked_errors[wv,i,j,p] = single_wv_stacks[key][stderr]
-								#if wv ==0:
-								#	self.bin_ids[key] = simstack[0]
-								#	pdb.set_trace()
 
 				self.simstack_flux_array = stacked_fluxes
 				self.simstack_error_array = stacked_fluxes
