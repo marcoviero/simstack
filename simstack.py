@@ -91,13 +91,12 @@ class PickledStacksReader:
 				for k in np.arange(self.nboots) + int(self.params['boot0']):
 					filename_boots = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '_boot_'+ str(k) + '.p'
 					if os.path.exists(self.path+filename_boots):
-						#pdb.set_trace()
 						bootstack = pickle.load( open( self.path + filename_boots, "rb" ))
-						if params['save_bin_ids'] == True:
+						if self.params['save_bin_ids'] == True:
 							for bbk in bootstack[0]:
 								self.bin_ids[bbk+'_'+str(k)] = bootstack[0][bbk]
 						for wv in range(self.nw):
-							if params['save_bin_ids'] == True:
+							if self.params['save_bin_ids'] == True:
 								try:
 									single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
 								except:
@@ -113,8 +112,8 @@ class PickledStacksReader:
 									p_suf = self.pops[p]
 									key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
 									#pdb.set_trace()
-									bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key][value]
-									bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key][value]
+									bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key]['value']
+									bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key]['stderr']
 
 				self.bootstrap_flux_array = bootstrap_fluxes
 				self.bootstrap_error_array = bootstrap_fluxes
@@ -135,8 +134,8 @@ class PickledStacksReader:
 							for p in range(self.npops):
 								p_suf = self.pops[p]
 								key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
-								stacked_fluxes[wv,i,j,p] = single_wv_stacks[key][value]
-								stacked_errors[wv,i,j,p] = single_wv_stacks[key][stderr]
+								stacked_fluxes[wv,i,j,p] = single_wv_stacks[key]['value']
+								stacked_errors[wv,i,j,p] = single_wv_stacks[key]['stderr']
 
 				self.simstack_flux_array = stacked_fluxes
 				self.simstack_error_array = stacked_fluxes
@@ -152,8 +151,8 @@ class PickledStacksReader:
 			z_nodes = self.params['bins']['z_nodes']
 		nz = len(z_nodes) - 1
 
-		return [str(z_nodes[i])+ '-' +str(z_nodes[i+1]) for i in range(nz)]
-		#return ['simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + str(z_nodes[i])+ '-' +str(z_nodes[i+1]) + '_boot_' for i in range(nz)]
+		#return [str(z_nodes[i])+ '-' +str(z_nodes[i+1]) for i in range(nz)]
+		return [str('{:.2f}'.format(z_nodes[i]))+ '-' +str('{:.2f}'.format(z_nodes[i+1])) for i in range(nz)]
 
 	def m_z_key_builder(self):
 
@@ -461,7 +460,7 @@ def stack_libraries_in_layers(
     stacked_layers[cname] = packed_fluxes
 
     #print  map_library.keys()[iwv]+' stack completed'
-    pdb.set_trace()
+    #pdb.set_trace()
 
   gc.collect
   return stacked_layers
@@ -731,3 +730,21 @@ def stack_multiple_fields_in_redshift_slices(
 
   return stacked_layers
   #return new_stacked_sed
+
+def is_true(raw_params, key):
+    """Is raw_params[key] true? Returns boolean value.
+    """
+    sraw    = raw_params[key]
+    s       = sraw.lower() # Make case-insensitive
+
+    # Lists of acceptable 'True' and 'False' strings
+    true_strings    = ['true', 't', 'yes', 'y', '0']
+    false_strings    = ['false', 'f', 'no', 'n', '-1']
+    if s in true_strings:
+        return True
+    elif s in false_strings:
+        return False
+    else:
+        logging.warning("Input not recognized for parameter: %s" % (key))
+        logging.warning("You provided: %s" % (sraw))
+        raise
