@@ -47,7 +47,7 @@ class PickledStacksReader:
 		self.wvs = [self.params['wavelength'].values()[i] for i in self.ind]
 		self.z_nodes = self.params['bins']['z_nodes']
 		self.m_nodes = self.params['bins']['m_nodes']
-		z_m_keys = self.m_z_key_builder(ndecimal=1)
+		z_m_keys = self.m_z_key_builder(ndecimal=2)
 		self.z_keys = z_m_keys[0]
 		self.m_keys = z_m_keys[1]
 		self.slice_keys = self.slice_key_builder()
@@ -82,7 +82,7 @@ class PickledStacksReader:
 		else:
 			stacked_fluxes = np.zeros([self.nw,self.nz,self.nm,self.npops])
 			stacked_errors = np.zeros([self.nw,self.nz,self.nm,self.npops])
-		slice_keys = self.slice_key_builder(ndecimal=1)
+		slice_keys = self.slice_key_builder(ndecimal=2)
 
 		for i in range(self.nz):
 			z_slice = slice_keys[i]
