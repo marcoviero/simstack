@@ -50,7 +50,7 @@ class PickledStacksReader:
 		z_m_keys = self.m_z_key_builder(ndecimal=2)
 		self.z_keys = z_m_keys[0]
 		self.m_keys = z_m_keys[1]
-		self.slice_keys = self.slice_key_builder()
+		#self.slice_keys = self.slice_key_builder(ndecimal=2)
 		#self.stack_keys = self.stack_key_builder()
 		#self.bootstrap_flux_array = np.array()
 		#self.bootstrap_error_array = {}
@@ -97,15 +97,16 @@ class PickledStacksReader:
 								self.bin_ids[bbk+'_'+str(k)] = bootstack[0][bbk]
 						for wv in range(self.nw):
 							if self.params['save_bin_ids'] == True:
-								try:
-									single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
-								except:
-									single_wv_stacks = bootstack[1][self.maps[wv]]
+                                                            #pdb.set_trace()
+                                                            try:
+								single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
+							    except:
+								single_wv_stacks = bootstack[1][self.maps[wv]]
 							else:
-								try:
-									single_wv_stacks = bootstack[z_slice][self.maps[wv]]
-								except:
-									single_wv_stacks = bootstack[self.maps[wv]]
+							    try:
+								single_wv_stacks = bootstack[z_slice][self.maps[wv]]
+							    except:
+								single_wv_stacks = bootstack[self.maps[wv]]
 							for j in range(self.nm):
 								m_suf = 'm_' + self.m_keys[j]
 								for p in range(self.npops):
