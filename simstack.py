@@ -47,7 +47,11 @@ class PickledStacksReader:
 		self.wvs = [self.params['wavelength'].values()[i] for i in self.ind]
 		self.z_nodes = self.params['bins']['z_nodes']
 		self.m_nodes = self.params['bins']['m_nodes']
-		z_m_keys = self.m_z_key_builder(ndecimal=2)
+		if self.params['bins']['bin_in_lookback_time'] == True:
+			self.ndec = 2
+		else:
+			self.ndec = 2
+		z_m_keys = self.m_z_key_builder(ndecimal=self.ndec)
 		self.z_keys = z_m_keys[0]
 		self.m_keys = z_m_keys[1]
 		#self.slice_keys = self.slice_key_builder(ndecimal=2)
@@ -82,7 +86,11 @@ class PickledStacksReader:
 		else:
 			stacked_fluxes = np.zeros([self.nw,self.nz,self.nm,self.npops])
 			stacked_errors = np.zeros([self.nw,self.nz,self.nm,self.npops])
-		slice_keys = self.slice_key_builder(ndecimal=2)
+		if self.params['bins']['bin_in_lookback_time'] == True:
+			ndec = 2
+		else:
+			ndec = 1
+		slice_keys = self.slice_key_builder(ndecimal=ndec)
 
 		for i in range(self.nz):
 			z_slice = slice_keys[i]
@@ -90,6 +98,7 @@ class PickledStacksReader:
 			if self.params['bootstrap'] == True:
 				for k in np.arange(self.nboots) + int(self.params['boot0']):
 					filename_boots = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '_boot_'+ str(k) + '.p'
+
 					if os.path.exists(self.path+filename_boots):
 						bootstack = pickle.load( open( self.path + filename_boots, "rb" ))
 						if self.params['save_bin_ids'] == True:
@@ -112,6 +121,7 @@ class PickledStacksReader:
 								for p in range(self.npops):
 									p_suf = self.pops[p]
 									key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
+									#pdb.set_trace()
 									try:
 										bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key].value
 										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key].stderr
