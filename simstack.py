@@ -16,6 +16,9 @@ from utils import pad_and_smooth_psf
 from utils import shift_twod
 from utils import smooth_psf
 from lmfit import Parameters, minimize, fit_report
+pi=3.141592653589793
+L_sun = 3.839e26 # W
+c = 299792458.0 # m/s
 
 class PickledStacksReader:
 
@@ -45,6 +48,7 @@ class PickledStacksReader:
 		self.ind = np.argsort(np.array([self.params['wavelength'][wv] for wv in self.params['wavelength']]))
 		self.maps = [self.params['wavelength'].keys()[i] for i in self.ind]
 		self.wvs = [self.params['wavelength'].values()[i] for i in self.ind]
+		self.fqs = [c * 1.e6 / self.params['wavelength'].values()[i] for i in self.ind]
 		self.z_nodes = self.params['bins']['z_nodes']
 		self.m_nodes = self.params['bins']['m_nodes']
 		if self.params['bins']['bin_in_lookback_time'] == True:
@@ -125,12 +129,15 @@ class PickledStacksReader:
 									try:
 										bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key].value
 										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key].stderr
+										bootstrap_intensities[wv,i,j,p,k] = single_wv_stacks[key].value * (self.fqs[wv]*1e9) * 1d-26 * 1e9
 									except:
 										bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key]['value']
 										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key]['stderr']
+										bootstrap_intensities[wv,i,j,p,k] = single_wv_stacks[key]['value'] * (self.fqs[wv]*1e9) * 1d-26 * 1e9
 
 				self.bootstrap_flux_array = bootstrap_fluxes
 				self.bootstrap_error_array = bootstrap_errors
+				self.bootstrap_nuInu_array = bootstrap_intensities
 			else:
 				filename_stacks = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '.p'
 				if os.path.exists(self.path+filename_stacks):
@@ -151,12 +158,15 @@ class PickledStacksReader:
 								try:
 									stacked_fluxes[wv,i,j,p] = single_wv_stacks[key].value
 									stacked_errors[wv,i,j,p] = single_wv_stacks[key].stderr
+									stacked_intensities[wv,i,j,p] = single_wv_stacks[key].value * (self.fqs[wv]*1e9) * 1d-26 * 1e9
 								except:
 									stacked_fluxes[wv,i,j,p] = single_wv_stacks[key]['value']
 									stacked_errors[wv,i,j,p] = single_wv_stacks[key]['stderr']
+									stacked_intensities[wv,i,j,p] = single_wv_stacks[key]['value'] * (self.fqs[wv]*1e9) * 1d-26 * 1e9
 
 				self.simstack_flux_array = stacked_fluxes
 				self.simstack_error_array = stacked_errors
+				self.simstack_nuInu_array = stacked_intensities
 
 	def is_bootstrap(self,config):
 		return config['bootstrap']
