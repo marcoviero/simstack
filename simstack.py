@@ -87,9 +87,11 @@ class PickledStacksReader:
 		if self.params['bootstrap'] == True:
 			bootstrap_fluxes = np.zeros([self.nw,self.nz,self.nm,self.npops,self.nboots])
 			bootstrap_errors = np.zeros([self.nw,self.nz,self.nm,self.npops,self.nboots])
+			bootstrap_intensities = np.zeros([self.nw,self.nz,self.nm,self.npops,self.nboots])
 		else:
 			stacked_fluxes = np.zeros([self.nw,self.nz,self.nm,self.npops])
 			stacked_errors = np.zeros([self.nw,self.nz,self.nm,self.npops])
+			stacked_intensities = np.zeros([self.nw,self.nz,self.nm,self.npops])
 		if self.params['bins']['bin_in_lookback_time'] == True:
 			ndec = 2
 		else:
