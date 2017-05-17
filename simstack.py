@@ -19,7 +19,7 @@ from lmfit import Parameters, minimize, fit_report
 
 class PickledStacksReader:
 
-	def __init__(self, config_path, config_file):
+	def __init__(self, config_path, config_file, ndecimal=2):
 		''' Uses the config_file to determine if it is bootstraps or not'''
 
 		self.path = config_path
@@ -48,9 +48,9 @@ class PickledStacksReader:
 		self.z_nodes = self.params['bins']['z_nodes']
 		self.m_nodes = self.params['bins']['m_nodes']
 		if self.params['bins']['bin_in_lookback_time'] == True:
-			self.ndec = 2
+			self.ndec = ndecimal
 		else:
-			self.ndec = 2
+			self.ndec = ndecimal
 		z_m_keys = self.m_z_key_builder(ndecimal=self.ndec)
 		self.z_keys = z_m_keys[0]
 		self.m_keys = z_m_keys[1]
@@ -130,7 +130,7 @@ class PickledStacksReader:
 										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key]['stderr']
 
 				self.bootstrap_flux_array = bootstrap_fluxes
-				self.bootstrap_error_array = bootstrap_fluxes
+				self.bootstrap_error_array = bootstrap_errors
 			else:
 				filename_stacks = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '.p'
 				if os.path.exists(self.path+filename_stacks):
@@ -156,14 +156,14 @@ class PickledStacksReader:
 									stacked_errors[wv,i,j,p] = single_wv_stacks[key]['stderr']
 
 				self.simstack_flux_array = stacked_fluxes
-				self.simstack_error_array = stacked_fluxes
+				self.simstack_error_array = stacked_errors
 
 	def is_bootstrap(self,config):
 		return config['bootstrap']
 
 	def slice_key_builder(self, ndecimal = 2):
 
-		decimal_suf = '{:.'+str(ndecimal)+'f}'
+		decimal_pre = '{:.'+str(ndecimal)+'f}'
 
 		if self.params['bins']['bin_in_lookback_time']:
 			z_nodes = self.params['bins']['t_nodes']
@@ -171,21 +171,20 @@ class PickledStacksReader:
 			z_nodes = self.params['bins']['z_nodes']
 		nz = len(z_nodes) - 1
 
-		#return [str(z_nodes[i])+ '-' +str(z_nodes[i+1]) for i in range(nz)]
-		return [str(decimal_suf.format(z_nodes[i]))+ '-' +str(decimal_suf.format(z_nodes[i+1])) for i in range(nz)]
+		return [str(decimal_pre.format(z_nodes[i]))+ '-' +str(decimal_pre.format(z_nodes[i+1])) for i in range(nz)]
 
 	def m_z_key_builder(self, ndecimal = 2):
 
 		z_suf = []
 		m_suf = []
 
-		decimal_suf = '{:.'+str(ndecimal)+'f}'
+		decimal_pre = '{:.'+str(ndecimal)+'f}'
 
 		for i in range(self.nz):
-			z_suf.append(decimal_suf.format(self.params['bins']['z_nodes'][i]) +'-'+ decimal_suf.format(self.params['bins']['z_nodes'][i+1]))
+			z_suf.append(decimal_pre.format(self.params['bins']['z_nodes'][i]) +'-'+ decimal_pre.format(self.params['bins']['z_nodes'][i+1]))
 
 		for j in range(self.nm):
-			m_suf.append(decimal_suf.format(self.params['bins']['m_nodes'][j]) +'-'+ decimal_suf.format(self.params['bins']['m_nodes'][j+1]))
+			m_suf.append(decimal_pre.format(self.params['bins']['m_nodes'][j]) +'-'+ decimal_pre.format(self.params['bins']['m_nodes'][j+1]))
 
 		return [z_suf, m_suf]
 
