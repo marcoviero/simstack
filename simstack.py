@@ -129,11 +129,11 @@ class PickledStacksReader:
 									try:
 										bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key].value
 										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key].stderr
-										bootstrap_intensities[wv,i,j,p,k] = single_wv_stacks[key].value * (self.fqs[wv]*1e9) * 1d-26 * 1e9
+										bootstrap_intensities[wv,i,j,p,k] = single_wv_stacks[key].value * (self.fqs[wv]*1e9) * 1e-26 * 1e9
 									except:
 										bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key]['value']
 										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key]['stderr']
-										bootstrap_intensities[wv,i,j,p,k] = single_wv_stacks[key]['value'] * (self.fqs[wv]*1e9) * 1d-26 * 1e9
+										bootstrap_intensities[wv,i,j,p,k] = single_wv_stacks[key]['value'] * (self.fqs[wv]*1e9) * 1e-26 * 1e9
 
 				self.bootstrap_flux_array = bootstrap_fluxes
 				self.bootstrap_error_array = bootstrap_errors
@@ -158,11 +158,11 @@ class PickledStacksReader:
 								try:
 									stacked_fluxes[wv,i,j,p] = single_wv_stacks[key].value
 									stacked_errors[wv,i,j,p] = single_wv_stacks[key].stderr
-									stacked_intensities[wv,i,j,p] = single_wv_stacks[key].value * (self.fqs[wv]*1e9) * 1d-26 * 1e9
+									stacked_intensities[wv,i,j,p] = single_wv_stacks[key].value * (self.fqs[wv]*1e9) * 1e-26 * 1e9
 								except:
 									stacked_fluxes[wv,i,j,p] = single_wv_stacks[key]['value']
 									stacked_errors[wv,i,j,p] = single_wv_stacks[key]['stderr']
-									stacked_intensities[wv,i,j,p] = single_wv_stacks[key]['value'] * (self.fqs[wv]*1e9) * 1d-26 * 1e9
+									stacked_intensities[wv,i,j,p] = single_wv_stacks[key]['value'] * (self.fqs[wv]*1e9) * 1e-26 * 1e9
 
 				self.simstack_flux_array = stacked_fluxes
 				self.simstack_error_array = stacked_errors
