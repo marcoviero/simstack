@@ -200,6 +200,26 @@ class PickledStacksReader:
 
 		return [z_suf, m_suf]
 
+def measure_cib(stacked_object,area_deg = 1.62, tcib = False):
+	if rea_deg == 1.62: print 'defaulting to uVista/COSMOS area of 1.62deg2'
+    area_sr = area_deg * (3.1415926535 / 180.)**2
+    cib = np.zeros(np.shape(stacked_object.simstack_nuInu_array))
+    for iwv in range(stacked_object.nw):
+        for i in range(stacked_object.nz):
+            zn = stacked_object.z_nodes[i:i+2]
+            z_suf = '{:.2f}'.format(zn[0])+'-'+'{:.2f}'.format(zn[1])
+
+            for j in range(stacked_object.nm):
+                mn = stacked_object.m_nodes[j:j+2]
+                m_suf = '{:.2f}'.format(mn[0])+'-'+'{:.2f}'.format(mn[1])
+                for p in range(stacked_object.npops):
+                    arg = clean_args('z_'+z_suf+'__m_'+m_suf+'_'+stacked_object.pops[p])
+                    ng = len(stacked_object.bin_ids[arg])
+                    cib[iwv,i,j,p] += 1e-9 * float(ng) / area_sr * stacked_object.simstack_nuInu_array[iwv,i,j,p]
+    if tcib == True:
+        return np.sum(np.sum(np.sum(cib,axis=1),axis=1),axis=1)
+    else:
+        return cib
 
 def simultaneous_stack_array_oned(p, layers_1d, data1d, err1d = None, arg_order = None):
   ''' Function to Minimize written specifically for lmfit '''
