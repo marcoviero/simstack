@@ -131,11 +131,11 @@ class PickledStacksReader:
 									try:
 										bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key].value
 										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key].stderr
-										bootstrap_intensities[wv,i,j,p,k] = single_wv_stacks[key].value * (self.fqs[wv]*1e9) * 1e-26 * 1e9
+										bootstrap_intensities[wv,i,j,p,k] = single_wv_stacks[key].value * (self.fqs[wv]) * 1e-26 * 1e9
 									except:
 										bootstrap_fluxes[wv,i,j,p,k] = single_wv_stacks[key]['value']
 										bootstrap_errors[wv,i,j,p,k] = single_wv_stacks[key]['stderr']
-										bootstrap_intensities[wv,i,j,p,k] = single_wv_stacks[key]['value'] * (self.fqs[wv]*1e9) * 1e-26 * 1e9
+										bootstrap_intensities[wv,i,j,p,k] = single_wv_stacks[key]['value'] * (self.fqs[wv]) * 1e-26 * 1e9
 
 				self.bootstrap_flux_array = bootstrap_fluxes
 				self.bootstrap_error_array = bootstrap_errors
