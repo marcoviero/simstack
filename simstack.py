@@ -19,6 +19,13 @@ from lmfit import Parameters, minimize, fit_report
 pi=3.141592653589793
 L_sun = 3.839e26 # W
 c = 299792458.0 # m/s
+conv_sfr = 1.728e-10 / 10**(.23)
+conv_luv_to_sfr = 2.17e-10
+conv_lir_to_sfr = 1.72e-10
+a_nu_flux_to_mass=6.7e19
+flux_to_specific_luminosity = 1.78 #1e-23 #1.78e-13
+h = 6.62607004e-34 #m2 kg / s  #4.13e-15 #eV/s
+k = 1.38064852e-23 #m2 kg s-2 K-1 8.617e-5 #eV/K
 
 class PickledStacksReader:
 
@@ -175,7 +182,8 @@ class PickledStacksReader:
 
 	def slice_key_builder(self, ndecimal = 2):
 
-		decimal_pre = '{:.'+str(ndecimal)+'f}'
+		decimal_pre_lo = '{:.'+str(ndecimal)+'f}'
+		decimal_pre_hi = '{:.'+str(ndecimal)+'f}'
 
 		if self.params['bins']['bin_in_lookback_time']:
 			z_nodes = self.params['bins']['t_nodes']
@@ -183,7 +191,11 @@ class PickledStacksReader:
 			z_nodes = self.params['bins']['z_nodes']
 		nz = len(z_nodes) - 1
 
-		return [str(decimal_pre.format(z_nodes[i]))+ '-' +str(decimal_pre.format(z_nodes[i+1])) for i in range(nz)]
+		slice_key = [str(decimal_pre_lo.format(z_nodes[i]))+ '-' +str(decimal_pre_hi.format(z_nodes[i+1])) for i in range(nz)]
+		if (slice_key[0] == '0.0-0.5') & (z_nodes[0] == 0.01):
+			slice_key[0] = '0.01-0.5'
+		#return [str(decimal_pre_lo.format(z_nodes[i]))+ '-' +str(decimal_pre_hi.format(z_nodes[i+1])) for i in range(nz)]
+		return slice_key
 
 	def m_z_key_builder(self, ndecimal = 2):
 
