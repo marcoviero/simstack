@@ -6,6 +6,8 @@ import os.path
 import sys
 import cPickle as pickle
 from astropy.wcs import WCS
+from astropy.cosmology import Planck15 as cosmo
+from astropy.cosmology import Planck15, z_at_value
 import parameters
 from utils import circle_mask
 from utils import clean_args
@@ -29,7 +31,7 @@ k = 1.38064852e-23 #m2 kg s-2 K-1 8.617e-5 #eV/K
 
 class PickledStacksReader:
 
-	def __init__(self, config_path, config_file, ndecimal=2):
+	def __init__(self, config_path, config_file, ndecimal=2, cosmo=cosmo, area_deg=1.62):
 		''' Uses the config_file to determine if it is bootstraps or not'''
 
 		self.path = config_path
@@ -212,8 +214,8 @@ class PickledStacksReader:
 
 		return [z_suf, m_suf]
 
-def measure_cib(stacked_object,area_deg = 1.62, tcib = False):
-	if rea_deg == 1.62:
+def measure_cib(stacked_object, area_deg=1.62, tcib=False):
+	if area_deg == 1.62:
 		print 'defaulting to uVista/COSMOS area of 1.62deg2'
 	area_sr = area_deg * (3.1415926535 / 180.)**2
 	cib = np.zeros(np.shape(stacked_object.simstack_nuInu_array))
