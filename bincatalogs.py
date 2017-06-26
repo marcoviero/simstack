@@ -15,7 +15,7 @@ class Field_catalogs:
 	def __init__(self, tbl):
 		self.table = tbl
 		self.nsrc = len(tbl)
-		self.id_z_ms_pop = {}
+		#self.id_z_ms_pop = {}
 
 	#def separate_by_nodes(self, nodes):
 	#	'''nodes should be a dictionary
