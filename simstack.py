@@ -120,6 +120,7 @@ class PickledStacksReader:
 							for bbk in bootstack[0].keys():
 								self.bin_ids[bbk+'_'+str(k)] = bootstack[0][bbk]
 						for wv in range(self.nw):
+							#pdb.set_trace1()
 							if self.params['save_bin_ids'] == True:
                                                             #pdb.set_trace()
                                                             try:
@@ -252,6 +253,9 @@ def simultaneous_stack_array_oned(p, layers_1d, data1d, err1d = None, arg_order 
       model[:] += layers_1d[i*len_model:(i+1)*len_model] * v[arg_order[i]]
     else:
       model[:] += layers_1d[i*len_model:(i+1)*len_model] * v[v.keys()[i]]
+
+  # Take the mean of the layers after they've been summed together
+  model -= np.mean(model)
 
   if err1d is None:
     return (data1d - model)
@@ -392,7 +396,9 @@ def stack_in_redshift_slices(
   nhits = np.shape(ind_fit)[1]
   cfits_maps = np.zeros([nlists,nhits])
 
-  kern = gauss_kern(fwhm, np.floor(fwhm * 10), pix)
+  #kern = gauss_kern(fwhm, np.floor(fwhm * 10), pix)
+  pdb.set_trace()
+  kern = gauss_kern(fwhm, np.floor(fwhm * 10)/pix, pix)
   for u in range(nlists):
     layer = layers[u,:,:]
     tmap = smooth_psf(layer, kern)
@@ -482,7 +488,6 @@ def stack_libraries_in_layers(
     del total_circles_mask
     nhits = np.shape(ind_fit)[1]
     ###
-    #cfits_maps = np.zeros([nlists,nhits])
     cfits_flat = np.asarray([])
     ###
 
@@ -491,16 +496,16 @@ def stack_libraries_in_layers(
     for u in range(nlists):
       layer = layers[u,:,:]
       #tmap = pad_and_smooth_psf(layer, kern)
+      #pdb.set_trace()
       tmap = smooth_psf(layer, kern)
-      tmap[ind_fit] -= np.mean(tmap[ind_fit])
+	  #Commented out next line, which is removal of mean, and replaced w/
+	  #summed mean removal in simultaneous_stack_array_oned.
+	  #Reason is because want faint sources to potentially be negative in
+	  #mean-subtraced map
+      #tmap[ind_fit] -= np.mean(tmap[ind_fit])
       cfits_flat = np.append(cfits_flat,np.ndarray.flatten(tmap[ind_fit]))
-      #cfits_maps[u,:] = tmap[ind_fit]
-
-    #print str(cwv)+' cube smoothed'
 
     cmap[ind_fit] -= np.mean(cmap[ind_fit], dtype=np.float32)
-    #flat_map = np.ndarray.flatten(cmap[ind_fit])
-    #flat_noise = np.ndarray.flatten(cnoise[ind_fit])
     imap = np.ndarray.flatten(cmap[ind_fit])
     ierr = np.ndarray.flatten(cnoise[ind_fit])
 
@@ -516,12 +521,8 @@ def stack_libraries_in_layers(
     del cfits_flat, imap, ierr
 
     #Dictionary keys decided here.  Was originally wavelengths.  Changing it back to map_names
-    #stacked_layers[str(cwv)] = cov_ss_1d.params
     packed_fluxes = pack_fluxes(cov_ss_1d.params)
     stacked_layers[cname] = packed_fluxes
-
-    #print  map_library.keys()[iwv]+' stack completed'
-    #pdb.set_trace()
 
   gc.collect
   return stacked_layers
