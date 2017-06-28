@@ -2,14 +2,26 @@
 An open-source, Python version of SIMSTACK. 
 
 For those familiar with the IDL version, viero_quick_stack is a similar wrapper to the stack_in_redshift_slices function.  
-The python version of the code is intended to be object oriented, with map objects (containing maps, noisemaps, beams, color corrections, etc.) and catalog objects (with RA/DEC lists for different selection criteria) collected into libraries, and SIMSTACK performed with one line of code.  
+The python version of the code is intended to be object oriented, with map objects (containing maps, noisemaps, beams, color corrections, etc.) and catalog objects (with RA/DEC lists for different selection criteria) collected into libraries, and SIMSTACK performed from *the command line*, or from a script containing one line of code.  
 
 ## Getting Started
 
-**As of *1/28/2017* SIMSTACK  got easier to use!** Edit the parameter file (**use example.cfg as a guide**) to set the local paths to your maps, catalogs, and pickles (examples below), as well as to choose the binning and method of stacking  and run from the command line with: 
+**As of *1/28/2017* SIMSTACK  got easier to use!** After setting local paths in your .bashrc (or .bash_profile), edit the parameter file (**use example.cfg as a guide**) to define your maps, catalogs, and pickled outputs (examples below), as well as to choose the binning and method of stacking,  and run from the command line with: 
 ../run_simstack_cmd_line.py example.cfg
 
+There are just a few steps needed to get started. 
+* Make sure all dependencies are installed
+* Set your paths in the .bashrc (or .bash_profile)
+* Edit the parameter file to 
+	* contain paths and map/catalog names
+	* desired binning
+	* whether to stack in redshift bins, or all at once
+	* map specific details like 
+		* color corrections 
+		* beam FWHM (solid angle if converting from MJy/sr to Jy/beam)
+
 ##### Dependencies
+* Python 2
 * Git repositories	
 	* simstack
 	* utils
@@ -18,8 +30,8 @@ The python version of the code is intended to be object oriented, with map objec
 * astropy
 * numpy
 * pandas
+* [lmfit](https://lmfit.github.io/lmfit-py/index.html) (latest version required or it will fail!)
 
-For those familiar with the IDL version, viero_quick_stack is a similar wrapper to the stack_in_redshift_slices function.  
 _Optional repositories if you choose to bin masses by constant number densities._
 
 ##### Local Paths
@@ -31,6 +43,8 @@ In your .bashrc define the following, with edits to define your prefered directo
 
 ##### Setting up the Parameter file to run simstack from command line 
 
+
+## Code Outputs
 
 ## Future Work
 
