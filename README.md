@@ -44,24 +44,25 @@ In your .bashrc define the following, with edits to define your prefered directo
 ## Setting up the Parameter file to run simstack from command line 
 To-be-completed (but it's pretty self explainatory, follow example.cfg)
 The only tricky part is defining [populations], which sets the the galaxy splitting scheme (and still needs work...)
-The two recommnded options (for now) are:
+The two recommended options (for now) are:
 * sf-qt
 	* Splits the sample into star-forming and quiescent according to the Williams UVJ definition.  Requires rest-frame U-J and V-J colors, labeled rf_U_V and rf_V_J, respectively.   
 * general
-	* Populations are defined by obeying __one__ condition (for now, ultimately would like no limit on conditions).      
+	* Populations are defined by obeying __one__ condition (for now, ultimately would like no limit on conditions). To ignore condition set it to False.  
 	Each line defines one population, and takes the form
 		* population_key = population_index condition_key greater_that less_than equal_to
 		For example: 
 			+ sf = 1 CLASS False False 1
 		the population 'sf' will be labeled 1 in the sfg column of the catalog, and is defined as objects with CLASS = 1 
         	+ sb = 2 lssfr -8.0 False
-        	the population 'sb' will be labeld 2 in the sfg column of the catalog, and is defined as objects whose lssfr < -8.0 
+        	the population 'sb' will be labeled 2 in the sfg column of the catalog, and is defined as objects whose lssfr < -8.0 
 
 	Conditions are set in reverse order, so if, say, a galaxy obeys the conditions of both sf and agn, but agn = 3 and sf = 1, then it will be defined as agn. 
 
 
 ## Code Outputs
-Objects!  Tools to read and interpret those objects are under constant developement and improving all the time.  An iPython Notebook is provided as an example of how to use the following functions:
+Objects!  Tools to read and interpret those objects are under constant developement and improving all the time.  
+[An iPython Notebook](https://github.com/marcoviero/simstack/tree/master/notebooks) is provided as an example of how to use the following functions:
 * from simstack import PickledStacksReader
 	* the workhorse.  Uses the info stored in the configuration file (which is rewritten to the output directory) to read in the stacks, determines if they are bootstraps, and if they are then calculates the uncertainties.  
 * from simstack import measure_cib
