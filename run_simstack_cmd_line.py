@@ -26,7 +26,7 @@ from utils import shift_twod
 from utils import smooth_psf
 from lmfit import Parameters, minimize, fit_report
 from simstack import stack_libraries_in_layers
-from simstack import is_true 
+from simstack import is_true
 from bootstrap import Bootstrap
 
 def main():
@@ -160,10 +160,12 @@ def get_catalogs(params):
 
     if 'z_peak' in tbl.keys():
         pass
-    elif 'ZPDF' in tbl.keys():
-        tbl['z_peak']=tbl['ZPDF']
-        #tbl['z_err']=tbl[['ZPDF_L68','ZPDF_H68']].mean(axis=1)
-        tbl['z_err']=((tbl['ZPDF']-tbl['ZPDF_L68']) + (tbl['ZPDF_H68']-tbl['ZPDF']))/2.0
+    elif 'PHOTOZ' in tbl.keys():
+        tbl['z_peak']=tbl['PHOTOZ']
+        #tbl['z_err']=((tbl['PHOTOZ']-tbl['PHOTOZ_L68']) + (tbl['PHOTOZ_H68']-tbl['PHOTOZ']))/2.0
+    #elif 'ZPDF' in tbl.keys():
+    #    tbl['z_peak']=tbl['ZPDF']
+    #    tbl['z_err']=((tbl['ZPDF']-tbl['ZPDF_L68']) + (tbl['ZPDF_H68']-tbl['ZPDF']))/2.0
 
     if 'LMASS' in tbl.keys():
         pass
