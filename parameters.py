@@ -209,8 +209,8 @@ def get_io_parameters(raw_params):
         io['shortname']              = ''
 
     io['output_folder']              = os.environ[raw_params['output_folder'].split()[0]] + raw_params['output_folder'].split()[1] # raw_params['output_folder']
-    #io['flux_densities_filename']    = raw_params['flux_densities_filename']
-    io['flux_densities_filename']    = 'simstack_flux_densities' 
+    io['flux_densities_filename']    = raw_params['flux_densities_filename']
+    #io['flux_densities_filename']    = 'simstack_flux_densities' 
 
     return io
 
