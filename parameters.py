@@ -210,10 +210,7 @@ def get_io_parameters(raw_params):
 
     io['output_folder']              = os.environ[raw_params['output_folder'].split()[0]] + raw_params['output_folder'].split()[1] # raw_params['output_folder']
     #io['flux_densities_filename']    = raw_params['flux_densities_filename']
-    #try:
-    #    io['boot_fluxes_filename']   = raw_params['boot_fluxes_filename']
-    #except KeyError:
-    #    io['boot_fluxes_filename']   = 'bootstrap_'
+    io['flux_densities_filename']    = 'simstack_flux_densities' 
 
     return io
 
