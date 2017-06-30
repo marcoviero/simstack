@@ -464,6 +464,7 @@ def stack_libraries_in_layers(
     ierr = np.ndarray.flatten(cnoise[ind_fit])
 
     fit_params = Parameters()
+    #pdb.set_trace()
     for iarg in range(nlists):
       arg = clean_args(lists[iarg])
       fit_params.add(arg,value= 1e-3*np.random.randn())
@@ -555,6 +556,7 @@ def stack_libraries_in_layers_w_background(
     nhits = np.shape(ind_fit)[1]
     ###
     cfits_flat = np.asarray([])
+    cfits_flat = np.append(cfits_flat,np.ndarray.flatten(np.ones(len(ind_fit))))
     ###
     #pdb.set_trace()
     for u in range(nlists):
@@ -567,6 +569,7 @@ def stack_libraries_in_layers_w_background(
     ierr = np.ndarray.flatten(cnoise[ind_fit])
 
     fit_params = Parameters()
+    fit_params.add('cib_background',value=1e-5*np.random.randn())
     for iarg in range(nlists):
       arg = clean_args(lists[iarg])
       fit_params.add(arg,value= 1e-3*np.random.randn())
