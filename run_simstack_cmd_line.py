@@ -55,6 +55,9 @@ def main():
     if params['bins']['stack_all_z_at_once'] == True: n_slices = 1
     else: n_slices = len(params['bins']['z_nodes']) - 1
 
+    #Save Parameter file in folder
+    save_paramfile(params)
+
     for i in range(n_slices):
         if params['bins']['stack_all_z_at_once'] == True:
             j = None
@@ -102,9 +105,6 @@ def main():
 
             save_stacked_fluxes(stacked_flux_densities,params, out_file_path,out_file_suffix, IDs=bin_ids)
         #pdb.set_trace()
-
-    #Save Parameter file in folder
-    save_paramfile(params)
 
     # Summarize timing
     t1 = time.time()
