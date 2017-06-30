@@ -40,6 +40,11 @@ def main():
     param_file_path = sys.argv[1]
     params = parameters.get_params(param_file_path)
 
+    zkey = params['zkey']
+    mkey = params['mkey']
+    rkey = params['ra_key']
+    dkey = params['dec_key']
+
     t0 = time.time()
 
     if params['bins']['bin_in_lookback_time'] == True:
@@ -56,12 +61,6 @@ def main():
             stacked_flux_density_key = 'all_'+z_pref
         else:
             j = i
-            #stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
-            #if params['bins']['bin_in_lookback_time'] == True:
-            #    stacked_flux_density_key = '{:.3f}'.format(params['bins']['t_nodes'][j])+'-'+'{:.3f}'.format(params['bins']['t_nodes'][j+1])
-            #else:
-            #    stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
-            #stacked_flux_density_key = str(params['bins']['t_nodes'][j])+'-'+str(params['bins']['t_nodes'][j+1])
             if params['bins']['bin_in_lookback_time'] == True:
                 stacked_flux_density_key = '{:.2f}'.format(params['bins']['t_nodes'][j])+'-'+'{:.2f}'.format(params['bins']['t_nodes'][j+1])
             else:
@@ -79,18 +78,9 @@ def main():
             #stacked_flux_densities = {}
             if params['bootstrap'] == True:
                 print 'Running ' +str(int(iboot))+' of '+ str(int(params['boot0'])) +'-'+ str(int(params['boot0']+params['number_of_boots']-1)) + ' bootstraps'
-                #if params['index_boots'] == True:
-                #    boot_indices_path = params['io']['output_folder']+'/bootstrapped_fluxes/bootstrap_indices/'
-                #    boot_index_key = ''
-                #    if not os.path.exists(boot_indices_path): os.makedirs(boot_indices_path)
-                #else:
-                #    boot_indices_path = False
-                #    boot_index_key = None
-                # pcat is an instance of Bootstrap
-                # pcat.perturb_catalog with options encoded in parameter file
-                #pcat.perturb_catalog(perturb_z = params['perturb_z'], boot_indices_path = boot_indices_path, boot_index_key = boot_index_key)
+
                 pcat.perturb_catalog(perturb_z = params['perturb_z'])
-                bootcat = Field_catalogs(pcat.pseudo_cat)
+                bootcat = Field_catalogs(pcat.pseudo_cat,zkey=zkey,mkey=mkey,rkey=rkey,dkey=dkey)
                 binned_ra_dec = get_bin_radec(params, bootcat, single_slice = j)
                 if params['save_bin_ids'] == False:
                     bin_ids = None
@@ -108,8 +98,6 @@ def main():
                 out_file_suffix = '_'+stacked_flux_density_key
 
             # Do simultaneous stacking
-            #pdb.set_trace()
-            #stacked_flux_densities[stacked_flux_density_key] = stack_libraries_in_layers(sky_library,binned_ra_dec)
             stacked_flux_densities = stack_libraries_in_layers(sky_library,binned_ra_dec)
 
             save_stacked_fluxes(stacked_flux_densities,params, out_file_path,out_file_suffix, IDs=bin_ids)
@@ -141,56 +129,20 @@ def get_maps(params):
 
 def get_catalogs(params):
 
-    # This formats the different catalogs to work with existing code.
-    # It's not the most elegant solution; better would be to make the code work with different column names.
+    # Formatting no longer needed as
     tbl = pd.read_table(params['catalogs']['catalog_path']+params['catalogs']['catalog_file'],sep=',')
 
-    if 'ID' in tbl.keys():
-        pass
-    elif 'ALPHA_J2000' in tbl.keys():
-            tbl['ID']=range(len(tbl['ALPHA_J2000']))
-    elif 'id' in tbl.keys():
-            tbl['ID']=tbl['id']
-
-    if 'ra' in tbl.keys():
-        pass
-    elif 'ALPHA_J2000' in tbl.keys():
-        tbl['ra']=tbl['ALPHA_J2000']
-        tbl['dec']=tbl['DELTA_J2000']
-
-    if 'z_peak' in tbl.keys():
-        pass
-    elif 'PHOTOZ' in tbl.keys():
-        tbl['z_peak']=tbl['PHOTOZ']
-        #tbl['z_err']=((tbl['PHOTOZ']-tbl['PHOTOZ_L68']) + (tbl['PHOTOZ_H68']-tbl['PHOTOZ']))/2.0
-    #elif 'ZPDF' in tbl.keys():
-    #    tbl['z_peak']=tbl['ZPDF']
-    #    tbl['z_err']=((tbl['ZPDF']-tbl['ZPDF_L68']) + (tbl['ZPDF_H68']-tbl['ZPDF']))/2.0
-
-    if 'LMASS' in tbl.keys():
-        pass
-    elif 'MASS_MED' in tbl.keys():
-        tbl['LMASS']=tbl['MASS_MED']
-        #tbl['LMASS_ERR']=tbl[['MASS_MED_MIN68','MASS_MED_MAX68']].mean(axis=1)
-        tbl['LMASS_ERR']=((tbl['MASS_MED']-tbl['MASS_MED_MIN68']) + (tbl['MASS_MED_MAX68']-tbl['MASS_MED']))/2.0
-
-    if 'lmass' in tbl.keys():
-        tbl['LMASS'] = tbl['lmass']
-
+    tbl['ID'] = range(len(tbl))
     if 'sfg' in tbl.keys():
         pass
     elif 'CLASS' in tbl.keys():
         tbl['sfg']=tbl['CLASS']
 
-    catout = Field_catalogs(tbl)
-    #try:
-    #    catout.table['sfg']
-    #    pass
-    #except KeyError:
-    #    if len(params['populations']) > 2:
-    #        catout.separate_pops_by_name(params['populations'])
-    #    else:
-    #        catout.separate_sf_qt()
+    zkey = params['zkey']
+    mkey = params['mkey']
+    rkey = params['ra_key']
+    dkey = params['dec_key']
+    catout = Field_catalogs(tbl,zkey=zkey,mkey=mkey,rkey=rkey,dkey=dkey)
 
     return catout
 
