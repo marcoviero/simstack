@@ -12,17 +12,14 @@ from astropy.cosmology import Planck15 as cosmo
 from astropy.cosmology import Planck15, z_at_value
 
 class Field_catalogs:
-	def __init__(self, tbl):
+	def __init__(self, tbl, zkey='z_peak', mkey='lmass', rkey='ra', dkey='dec'):
 		self.table = tbl
 		self.nsrc = len(tbl)
-		#self.id_z_ms_pop = {}
-
-	#def separate_by_nodes(self, nodes):
-	#	'''nodes should be a dictionary
-	#	with the name of the feature (e.g., sf or agn) as key
-	#	and the array as value
-	#	'''
-	#	sfg = np.ones(self.nsrc)
+		self.zkey = zkey#.lower()
+		self.mkey = mkey#.lower()
+		self.rkey = rkey#.lower()
+		self.dkey = dkey#.lower()
+		#pdb.set_trace()
 
 	def separate_pops_by_index(self, cuts_dict, uvj = True):
 		'''
@@ -77,9 +74,9 @@ class Field_catalogs:
 			# If no condition yet met then see if it's Quiescent
 			if (sfg[i] == 1) & (uvj == True):
 					if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-						if (self.table.z_peak.values[i] < 1):
+						if (self.table[self.zkey][i] < 1):
 							if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-						if (self.table.z_peak.values[i] > 1):
+						if (self.table[self.zkey][i] > 1):
 							if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 
 		self.table['sfg'] = sfg
@@ -142,9 +139,9 @@ class Field_catalogs:
 			# If no condition yet met then see if it's Quiescent
 			if (sfg[i] == 1) & (uvj == True):
 					if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-						if (self.table.z_peak.values[i] < 1):
+						if (self.table[self.zkey][i] < 1):
 							if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-						if (self.table.z_peak.values[i] > 1):
+						if (self.table[self.zkey][i] > 1):
 							if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 
 		self.table['sfg'] = sfg
@@ -154,9 +151,9 @@ class Field_catalogs:
 		#pdb.set_trace()
 		for i in range(self.nsrc):
 			if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-				if (self.table.z_peak.values[i] < 1):
+				if (self.table[self.zkey][i] < 1):
 					if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-				if (self.table.z_peak.values[i] > 1):
+				if (self.table[self.zkey][i] > 1):
 					if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 		#indsf = np.where(sfg == 1)
 		#indqt = np.where(sfg == 0)
@@ -174,9 +171,9 @@ class Field_catalogs:
 				sfg[i]=2
 			else:
 				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-					if (self.table.z_peak.values[i] < 1):
+					if (self.table[self.zkey][i] < 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-					if (self.table.z_peak.values[i] > 1):
+					if (self.table[self.zkey][i] > 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 		#indsf = np.where(sfg == 1)
 		#indqt = np.where(sfg == 0)
@@ -191,9 +188,9 @@ class Field_catalogs:
 				sfg[i]=2
 			else:
 				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-					if (self.table.z_peak.values[i] < 1):
+					if (self.table[self.zkey][i] < 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-					if (self.table.z_peak.values[i] > 1):
+					if (self.table[self.zkey][i] > 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 		#indsf = np.where(sfg == 1)
 		#indqt = np.where(sfg == 0)
@@ -205,9 +202,9 @@ class Field_catalogs:
 		ncolor= len(uvj_nodes)-1 + 1 #+1 is qt
 		for i in range(self.nsrc):
 			if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-				if (self.table.z_peak.values[i] < 1):
+				if (self.table[self.zkey][i] < 1):
 					if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=ncolor-1
-				if (self.table.z_peak.values[i] > 1):
+				if (self.table[self.zkey][i] > 1):
 					if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=ncolor-1
 			if sfg[i] < ncolor-1:
 				for j in range(ncolor-1):
@@ -223,15 +220,15 @@ class Field_catalogs:
 				sfg[i]=4 #SB
 			elif (self.table.ltau.values[i] < tau_cut):
 				sfg[i]=3 #Dusty
-			elif (self.table.LMASS[i] > self.table.z_peak[i] * slope + z0) & (self.table.mips24[i] > 250):
+			elif (self.table[self.mkey][i] > self.table[self.zkey][i] * slope + z0) & (self.table.mips24[i] > 250):
 				sfg[i]=5 #LOCAL
 			elif (self.table.F_ratio[i] >= Fcut):
 				sfg[i]=2 #AGN
 			else:
 				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-					if (self.table.z_peak.values[i] < 1):
+					if (self.table[self.zkey][i] < 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-					if (self.table.z_peak.values[i] > 1):
+					if (self.table[self.zkey][i] > 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
@@ -243,15 +240,15 @@ class Field_catalogs:
 			#pdb.set_trace()
 			if (self.table.mips24.values[i] >= (MIPS24_cut+100.)) & (self.table.F_ratio.values[i] < Fcut):
 				sfg[i]=4
-			elif (self.table.LMASS.values[i] > self.table.z_peak.values[i] * slope + z0) & (self.table.mips24.values[i] > MIPS24_cut):
+			elif (self.table[self.mkey][i] > self.table[self.zkey][i] * slope + z0) & (self.table.mips24.values[i] > MIPS24_cut):
 				sfg[i]=3
 			elif (self.table.F_ratio.values[i] >= Fcut):
 				sfg[i]=2
 			else:
 				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-					if (self.table.z_peak.values[i] < 1):
+					if (self.table[self.zkey][i] < 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-					if (self.table.z_peak.values[i] > 1):
+					if (self.table[self.zkey][i] > 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
@@ -262,15 +259,15 @@ class Field_catalogs:
 		for i in range(self.nsrc):
 			if (10**(self.table.lssfr.values[i])*1e9 >= ssfr ) & (self.table.F_ratio.values[i] < Fcut):
 				sfg[i]=4
-			elif (self.table.LMASS.values[i] > self.table.z_peak.values[i] * slope + z0) & (self.table.mips24.values[i] > 250):
+			elif (self.table[self.mkey][i] > self.table[self.zkey][i] * slope + z0) & (self.table.mips24.values[i] > 250):
 				sfg[i]=3
 			elif (self.table.F_ratio.values[i] >= Fcut):
 				sfg[i]=2
 			else:
 				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-					if (self.table.z_peak.values[i] < 1):
+					if (self.table[self.zkey][i] < 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-					if (self.table.z_peak.values[i] > 1):
+					if (self.table[self.zkey][i] > 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
@@ -283,9 +280,9 @@ class Field_catalogs:
 				sfg[i]=2
 			else:
 				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-					if (self.table.z_peak.values[i] < 1):
+					if (self.table[self.zkey][i] < 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-					if (self.table.z_peak.values[i] > 1):
+					if (self.table[self.zkey][i] > 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
@@ -296,9 +293,9 @@ class Field_catalogs:
 				sfg[i]=2
 			else:
 				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-					if (self.table.z_peak.values[i] < 1):
+					if (self.table[self.zkey][i] < 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-					if (self.table.z_peak.values[i] > 1):
+					if (self.table[self.zkey][i] > 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
@@ -309,9 +306,9 @@ class Field_catalogs:
 				sfg[i]=2
 			else:
 				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
-					if (self.table.z_peak.values[i] < 1):
+					if (self.table[self.zkey][i] < 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
-					if (self.table.z_peak.values[i] > 1):
+					if (self.table[self.zkey][i] > 1):
 						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
@@ -325,11 +322,11 @@ class Field_catalogs:
 			for jm in range(len(mnodes[:-1])):
 				for k in pop_dict:
 					if linear_mass == 1:
-						ind_mz =( (self.table.sfg.values == pop_dict[k][0]) & (self.table.z_peak.values >= np.min(znodes[iz:iz+2])) & (self.table.z_peak.values < np.max(znodes[iz:iz+2])) &
-							(10**self.table.LMASS.values >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS.values < 10**np.max(mnodes[jm:jm+2])) )
+						ind_mz =( (self.table.sfg.values == pop_dict[k][0]) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+							(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 					else:
-						ind_mz =( (self.table.sfg == pop_dict[k][0]) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-							(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
+						ind_mz =( (self.table.sfg == pop_dict[k][0]) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+							(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
 
 					self.subpop_ids['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_'+k] = self.table.ID[ind_mz].values
 					#self.subpop_ids['z_'+clean_args('{:.3f}'.format(znodes[iz]))+'_'+clean_args('{:.3f}'.format(znodes[iz+1]))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_'+k] = self.table.ID[ind_mz].values
@@ -338,10 +335,10 @@ class Field_catalogs:
 		self.id_z_ms = {}
 		for iz in range(len(znodes[:-1])):
 			for jm in range(len(mnodes[:-1])):
-				ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-				ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+				ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+					(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+				ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+					(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 
 				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
 				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
@@ -353,10 +350,10 @@ class Field_catalogs:
 
 		for iz in range(len(znodes[:-1])):
 			for jm in range(len(mnodes[:-1])):
-				ind_mt_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-				ind_mt_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+				ind_mt_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+					(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+				ind_mt_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+					(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 
 				self.id_lookt_mass['lookt_'+clean_args(str('{:.2f}'.format(tnodes[iz])))+'_'+clean_args(str('{:.2f}'.format(tnodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mt_sf].values
 				self.id_lookt_mass['lookt_'+clean_args(str('{:.2f}'.format(tnodes[iz])))+'_'+clean_args(str('{:.2f}'.format(tnodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mt_qt].values
@@ -365,12 +362,12 @@ class Field_catalogs:
 		self.id_z_ms = {}
 		for iz in range(len(znodes[:-1])):
 			for jm in range(len(mnodes[:-1])):
-				ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-				ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-				ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+				ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+					(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+				ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+					(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+				ind_mz_agn =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+					(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 
 				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
 				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
@@ -383,11 +380,11 @@ class Field_catalogs:
 			for jm in range(len(mnodes[:-1])):
 				for kc in range(len(cnodes)):
 					if linear_mass == 1:
-						ind_mz =( (self.table.sfg == kc) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-							(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+						ind_mz =( (self.table.sfg == kc) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+							(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 					else:
-						ind_mz =( (self.table.sfg == kc) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-							(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
+						ind_mz =( (self.table.sfg == kc) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+							(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
 
 					if kc < len(cnodes)-1: csuf = 'sf'+str(kc)
 					else: csuf = 'qt'
@@ -399,19 +396,19 @@ class Field_catalogs:
 		for iz in range(len(znodes[:-1])):
 			for jm in range(len(mnodes[:-1])):
 				if linear_mass == 1:
-					ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_agn =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 				else:
-					ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
+					ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_agn =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
 
 				self.id_z_ms_3pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
 				self.id_z_ms_3pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
@@ -423,19 +420,19 @@ class Field_catalogs:
 		for iz in range(len(znodes[:-1])):
 			for jm in range(len(mnodes[:-1])):
 				if linear_mass == 1:
-					ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_sb =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_sb =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 				else:
-					ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_sb =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
+					ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_sb =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
 
 				self.id_z_ms_3pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
 				self.id_z_ms_3pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
@@ -447,23 +444,23 @@ class Field_catalogs:
 		for iz in range(len(znodes[:-1])):
 			for jm in range(len(mnodes[:-1])):
 				if linear_mass == 1:
-					ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_sb =( (self.table.sfg == 3) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_agn =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_sb =( (self.table.sfg == 3) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 				else:
-					ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_sb =( (self.table.sfg == 3) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
+					ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_agn =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_sb =( (self.table.sfg == 3) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
 
 				self.id_z_ms_4pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
 				self.id_z_ms_4pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
@@ -476,27 +473,27 @@ class Field_catalogs:
 		for iz in range(len(znodes[:-1])):
 			for jm in range(len(mnodes[:-1])):
 				if linear_mass == 1:
-					ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_sb =( (self.table.sfg == 4) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_loc=( (self.table.sfg == 3) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_agn =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_sb =( (self.table.sfg == 4) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_loc=( (self.table.sfg == 3) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 				else:
-					ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_sb =( (self.table.sfg == 4) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_loc=( (self.table.sfg == 3) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
+					ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_agn =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_sb =( (self.table.sfg == 4) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_loc=( (self.table.sfg == 3) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
 
 				self.id_z_ms_5pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
 				self.id_z_ms_5pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
@@ -510,31 +507,31 @@ class Field_catalogs:
 		for iz in range(len(znodes[:-1])):
 			for jm in range(len(mnodes[:-1])):
 				if linear_mass == 1:
-					ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_sb =( (self.table.sfg == 4) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_dst=( (self.table.sfg == 3) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
-					ind_mz_loc=( (self.table.sfg == 5) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_agn =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_sb =( (self.table.sfg == 4) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_dst=( (self.table.sfg == 3) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
+					ind_mz_loc=( (self.table.sfg == 5) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 				else:
-					ind_mz_sf =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_qt =( (self.table.sfg == 0) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_agn =( (self.table.sfg == 2) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_sb =( (self.table.sfg == 4) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_dst=( (self.table.sfg == 3) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
-					ind_mz_loc=( (self.table.sfg == 5) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(self.table.LMASS >= np.min(mnodes[jm:jm+2])) & (self.table.LMASS < np.max(mnodes[jm:jm+2])) )
+					ind_mz_sf =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_qt =( (self.table.sfg == 0) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_agn =( (self.table.sfg == 2) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_sb =( (self.table.sfg == 4) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_dst=( (self.table.sfg == 3) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
+					ind_mz_loc=( (self.table.sfg == 5) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
 
 				self.id_z_ms_6pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_sf'] = self.table.ID[ind_mz_sf].values
 				self.id_z_ms_6pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_qt'] = self.table.ID[ind_mz_qt].values
@@ -547,8 +544,8 @@ class Field_catalogs:
 		if initialize_pop == True: self.id_z_ms = {}
 		for iz in range(len(znodes[:-1])):
 			for jm in range(len(mnodes[:-1])):
-				ind_mz =( (self.table.sfg == 1) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+				ind_mz =( (self.table.sfg == 1) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+					(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 
 				self.id_z_ms['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+suffx] = self.table.ID[ind_mz].values
 
@@ -556,8 +553,8 @@ class Field_catalogs:
 		if initialize_pop == True: self.id_z_ms_pop = {}
 		for iz in range(len(znodes[:-1])):
 			for jm in range(len(mnodes[:-1])):
-				ind_mz =( (self.table.sfg == sfg) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-					(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) )
+				ind_mz =( (self.table.sfg == sfg) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+					(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) )
 
 				self.id_z_ms_pop['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+pop_suffix] = self.table.ID[ind_mz].values
 
@@ -570,19 +567,19 @@ class Field_catalogs:
 			for jm in range(len(mnodes[:-1])):
 				if nc > 1:
 					for kc in range(len(crange[:-1])):
-						ind_crit =( (self.table.sfg == sfg) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-							(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) &
+						ind_crit =( (self.table.sfg == sfg) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+							(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) &
 							(clean_nans(self.table[criteria]) >= crange[kc]) & (clean_nans(self.table[criteria]) < crange[kc+1]) )
 
 						arg = 'z_'+str('{:.2f}'.format(znodes[iz]))+'_'+str('{:.2f}'.format(znodes[iz+1]))+'__m_'+str('{:.2f}'.format(mnodes[jm]))+'_'+str('{:.2f}'.format(mnodes[jm+1]))+'__'+criteria+'_'+str('{:.2f}'.format(crange[kc],2))+'_'+str('{:.2f}'.format(crange[kc+1],2))+'_'+pop[sfg]
 						self.id_crit[clean_args(arg)] = self.table.ID[ind_crit].values
 				else:
 					#above and below no?
-					ind_above =( (self.table.sfg == sfg) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) &
+					ind_above =( (self.table.sfg == sfg) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) &
 						(clean_nans(self.table[criteria]) >= crange[0]) )
-					ind_below =( (self.table.sfg == sfg) & (self.table.z_peak >= np.min(znodes[iz:iz+2])) & (self.table.z_peak < np.max(znodes[iz:iz+2])) &
-						(10**self.table.LMASS >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table.LMASS < 10**np.max(mnodes[jm:jm+2])) &
+					ind_below =( (self.table.sfg == sfg) & (self.table[self.zkey] >= np.min(znodes[iz:iz+2])) & (self.table[self.zkey] < np.max(znodes[iz:iz+2])) &
+						(10**self.table[self.mkey] >= 10**np.min(mnodes[jm:jm+2])) & (10**self.table[self.mkey] < 10**np.max(mnodes[jm:jm+2])) &
 						(clean_nans(self.table[criteria]) < crange[0]) )
 
 					arg = 'z_'+str('{:.2f}'.format(znodes[iz]))+'_'+str('{:.2f}'.format(znodes[iz+1]))+'__m_'+str('{:.2f}'.format(mnodes[jm]))+'_'+str('{:.2f}'.format(mnodes[jm+1]))+'__'+criteria+'_ge_'+str('{:.2f}'.format(crange[0],2))+'_'+pop[sfg]
@@ -595,7 +592,7 @@ class Field_catalogs:
 		self.id_z_sed = {}
 		for ch in self.table.parent.unique():
 			for iz in range(len(znodes[:-1])):
-				self.id_z_sed['z_'+clean_args(str(znodes[iz]))+'_'+clean_args(str(znodes[iz+1]))+'__sed'+str(ch)] = self.table.ID[ (self.table.parent == ch) & (self.table.z_peak >= znodes[iz]) & (self.table.z_peak < znodes[iz+1]) ].values
+				self.id_z_sed['z_'+clean_args(str(znodes[iz]))+'_'+clean_args(str(znodes[iz+1]))+'__sed'+str(ch)] = self.table.ID[ (self.table.parent == ch) & (self.table[self.zkey] >= znodes[iz]) & (self.table[self.zkey] < znodes[iz+1]) ].values
 
 	def get_parent_child_bins(self):
 		self.id_children = {}
@@ -611,10 +608,11 @@ class Field_catalogs:
 		#dec = {}
 		#pdb.set_trace()
 		for k in radec_ids.keys():
-			ra  = self.table.ra[self.table.ID.isin(radec_ids[k])].values
-			dec = self.table.dec[self.table.ID.isin(radec_ids[k])].values
-			#self.ra_dec[k] = [ra,dec]
-			#ra[k]  = ra
-			#dec[k] = dec
+			ra0  = self.table[self.rkey]
+			dec0 = self.table[self.dkey]
+			ra  = ra0[self.table.ID.isin(radec_ids[k])].values
+			dec = dec0[self.table.ID.isin(radec_ids[k])].values
+			#ra  = self.table.ra[self.table.ID.isin(radec_ids[k])].values
+			#dec = self.table.dec[self.table.ID.isin(radec_ids[k])].values
 			ra_dec[k] = [ra,dec]
 		return ra_dec
