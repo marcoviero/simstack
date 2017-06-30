@@ -30,6 +30,7 @@ def get_params(param_file_path):
     config.read(param_file_path)
 
     # Get "raw" dictionaries from `config` object
+    #pdb.set_trace()
     raw_params = dict(config.items('general'))
     raw_cosmo_params = dict(config.items('cosmology'))
     raw_pop_params = dict(config.items('populations'))
