@@ -100,6 +100,12 @@ def get_general_params(raw_params):
     except:
         params['ra_key'] = 'ra'
         params['dec_key'] = 'dec'
+    try:
+        params['uv_key'] = raw_params['uv_key']
+        params['vj_key'] = raw_params['vj_key']
+    except:
+        params['uv_key'] = 'rf_U_V'
+        params['vj_key'] = 'rf_V_J'
 
     #pdb.set_trace()
     # Type of galaxy split.  Default is UVJ star-forming / quiescent
