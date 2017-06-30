@@ -86,6 +86,21 @@ def get_params(param_file_path):
 def get_general_params(raw_params):
     params = {} # Initialize parameter dictionary
 
+    # Catalog specific names for keys
+    try:
+        params['zkey'] = raw_params['zkey']
+        params['mkey'] = raw_params['mkey']
+    except:
+        params['zkey'] = 'z_peak'
+        params['mkey'] = 'lmass'
+    try:
+        params['ra_key'] = raw_params['ra_key']
+        params['dec_key'] = raw_params['dec_key']
+    except:
+        params['ra_key'] = 'ra'
+        params['dec_key'] = 'dec'
+
+    #pdb.set_trace()
     # Type of galaxy split.  Default is UVJ star-forming / quiescent
     try:
         params['galaxy_splitting_scheme'] = raw_params['classification_scheme']
@@ -208,9 +223,9 @@ def get_io_parameters(raw_params):
     except KeyError:
         io['shortname']              = ''
 
-    io['output_folder']              = os.environ[raw_params['output_folder'].split()[0]] + raw_params['output_folder'].split()[1] # raw_params['output_folder']
+    io['output_folder']              = os.environ[raw_params['output_folder'].split()[0]] + raw_params['output_folder'].split()[1]
     io['flux_densities_filename']    = raw_params['flux_densities_filename']
-    #io['flux_densities_filename']    = 'simstack_flux_densities' 
+    #io['flux_densities_filename']    = 'simstack_flux_densities'
 
     return io
 
