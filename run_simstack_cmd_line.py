@@ -241,6 +241,8 @@ def save_paramfile(params):
         outdir   = params['io']['output_folder']+'/bootstrapped_fluxes/'+params['io']['shortname']
     else:
         outdir   = params['io']['output_folder']+'/simstack_fluxes/'+params['io']['shortname']
+    print 'writing parameter file to '+outdir
+    if not os.path.exists(outdir): os.makedirs(outdir)
     fname    = os.path.basename(fp_in)
     fp_out   = os.path.join(outdir, fname)
 
