@@ -481,6 +481,109 @@ def stack_libraries_in_layers(
   gc.collect
   return stacked_layers
 
+def stack_libraries_in_layers_w_background(
+  map_library,
+  subcatalog_library,
+  quiet=None):
+
+  map_names = [i for i in map_library.keys()]
+  # All wavelengths in cwavelengths
+  cwavelengths = [map_library[i].wavelength for i in map_names]
+  # Unique wavelengths in uwavelengths
+  uwavelengths = np.sort(np.unique(cwavelengths))
+  # nwv the number of unique wavelengths
+  nwv = len(uwavelengths)
+
+  lists = subcatalog_library.keys()
+  nlists = len(lists)
+  #stacked_sed=np.zeros([nwv, nlists])
+  #stacked_sed_err=np.zeros([nwv,nlists])
+  stacked_layers = {}
+
+  cwavelengths = []
+  radius = 1.1
+  for iwv in range(nwv):
+    print 'stacking '+map_library.keys()[iwv]
+    #READ MAPS
+    cmap = map_library[map_library.keys()[iwv]].map
+    cnoise = map_library[map_library.keys()[iwv]].noise
+    cwv = map_library[map_library.keys()[iwv]].wavelength
+    cname = map_library.keys()[iwv]
+    cwavelengths.append(cwv)
+    chd = map_library[map_library.keys()[iwv]].header
+    pixsize = map_library[map_library.keys()[iwv]].pixel_size
+    kern = map_library[map_library.keys()[iwv]].psf
+    fwhm = map_library[map_library.keys()[iwv]].fwhm
+    cw = WCS(chd)
+    cms = np.shape(cmap)
+    zeromask = np.ones(np.shape(cmap))
+    #ind_map_zero = np.where(np.isnan(cmap))
+    ind_map_zero = np.where(clean_nans(cmap) == 0.0)
+    zeromask[ind_map_zero] = 0.0
+    #pdb.set_trace()
+
+    # STEP 1  - Make Layers Cube at each wavelength
+    layers=np.zeros([nlists+1,cms[0],cms[1]])
+
+    for k in range(nlists):
+      s = lists[k]
+      if len(subcatalog_library[s][0]) > 0:
+        ra = subcatalog_library[s][0]
+        dec = subcatalog_library[s][1]
+        ty,tx = cw.wcs_world2pix(ra, dec, 0)
+        # CHECK FOR SOURCES THAT FALL OUTSIDE MAP
+        ind_keep = np.where((np.round(tx) >= 0) & (np.round(tx) < cms[0]) & (np.round(ty) >= 0) & (np.round(ty) < cms[1]))
+        real_x=np.round(tx[ind_keep]).astype(int)
+        real_y=np.round(ty[ind_keep]).astype(int)
+        # CHECK FOR SOURCES THAT FALL ON ZEROS
+        ind_nz=np.where(cmap[real_x,real_y] != 0 )
+        nt = np.shape(ind_nz)[1]
+        #print 'ngals: ' + str(nt)
+        if nt > 0:
+          real_x = real_x[ind_nz]
+          real_y = real_y[ind_nz]
+
+          for ni in range(nt):
+            layers[k, real_x[ni],real_y[ni]]+=1.0
+
+    # STEP 2  - Convolve Layers and put in pixels
+    flattened_pixmap = np.sum(layers,axis=0)
+    total_circles_mask = circle_mask(flattened_pixmap, radius * fwhm, pixsize)
+    #ind_fit = np.where(total_circles_mask >= 1)
+    ind_fit = np.where((total_circles_mask >= 1) & (zeromask != 0))
+    del total_circles_mask
+    nhits = np.shape(ind_fit)[1]
+    ###
+    cfits_flat = np.asarray([])
+    ###
+    #pdb.set_trace()
+    for u in range(nlists):
+      layer = layers[u,:,:]
+      tmap = smooth_psf(layer, kern)
+      cfits_flat = np.append(cfits_flat,np.ndarray.flatten(tmap[ind_fit]))
+
+    cmap[ind_fit] -= np.mean(cmap[ind_fit], dtype=np.float32)
+    imap = np.ndarray.flatten(cmap[ind_fit])
+    ierr = np.ndarray.flatten(cnoise[ind_fit])
+
+    fit_params = Parameters()
+    for iarg in range(nlists):
+      arg = clean_args(lists[iarg])
+      fit_params.add(arg,value= 1e-3*np.random.randn())
+
+
+    if len(ierr)==0: pdb.set_trace()
+    cov_ss_1d = minimize(simultaneous_stack_array_oned, fit_params,
+      args=(cfits_flat,), kws={'data1d':imap,'err1d':ierr}, nan_policy = 'propagate')
+    del cfits_flat, imap, ierr
+
+    #Dictionary keys decided here.  Was originally wavelengths.  Changing it back to map_names
+    packed_fluxes = pack_fluxes(cov_ss_1d.params)
+    stacked_layers[cname] = packed_fluxes
+
+  gc.collect
+  return stacked_layers
+
 def pack_fluxes(input_params):
 	packed_fluxes = {}
 	for iparam in input_params:
