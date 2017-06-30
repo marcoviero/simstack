@@ -107,12 +107,17 @@ class PickledStacksReader:
 			ndec = 1
 		slice_keys = self.slice_key_builder(ndecimal=ndec)
 
+		#pdb.set_trace()
+
 		for i in range(self.nz):
 			z_slice = slice_keys[i]
 			z_suf = 'z_'+ self.z_keys[i]
 			if self.params['bootstrap'] == True:
 				for k in np.arange(self.nboots) + int(self.params['boot0']):
-					filename_boots = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '_boot_'+ str(k) + '.p'
+					if self.params['bins']['stack_all_z_at_once'] == True:
+						filename_boots = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_all_z' + '_boot_'+ str(k) + '.p'
+					else:
+						filename_boots = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '_boot_'+ str(k) + '.p'
 
 					if os.path.exists(self.path+filename_boots):
 						bootstack = pickle.load( open( self.path + filename_boots, "rb" ))
@@ -122,11 +127,10 @@ class PickledStacksReader:
 						for wv in range(self.nw):
 							#pdb.set_trace1()
 							if self.params['save_bin_ids'] == True:
-                                                            #pdb.set_trace()
-                                                            try:
-								single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
-							    except:
-								single_wv_stacks = bootstack[1][self.maps[wv]]
+								try:
+									single_wv_stacks = bootstack[1][z_slice][self.maps[wv]]
+								except:
+									single_wv_stacks = bootstack[1][self.maps[wv]]
 							else:
 							    try:
 								single_wv_stacks = bootstack[z_slice][self.maps[wv]]
@@ -151,7 +155,10 @@ class PickledStacksReader:
 				self.bootstrap_error_array = bootstrap_errors
 				self.bootstrap_nuInu_array = bootstrap_intensities
 			else:
-				filename_stacks = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '.p'
+				if self.params['bins']['stack_all_z_at_once'] == True:
+					filename_stacks = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_all_z' + '.p'
+				else:
+					filename_stacks = 'simstack_flux_densities_'+ self.params['io']['shortname'] + '_' + z_slice + '.p'
 				if os.path.exists(self.path+filename_stacks):
 					simstack = pickle.load( open( self.path + filename_stacks, "rb" ))
 					#pdb.set_trace()
