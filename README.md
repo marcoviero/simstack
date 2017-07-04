@@ -1,5 +1,5 @@
 # simstack
-An open-source, user-friendly Python version of SIMSTACK.  
+An open-source, user-friendly, Python version of SIMSTACK.  
 
 **As of *1/28/2017* SIMSTACK  got easier to use!** After setting local paths in your .bashrc (or .bash_profile), edit the parameter file (**use example.cfg as a guide**) to define your maps, catalogs, and pickled outputs (examples below), as well as to choose the binning and method of stacking,  and run from the command line with: 
 ../run_simstack_cmd_line.py example.cfg
@@ -10,7 +10,7 @@ The python version of the code is intended to be object oriented, with map objec
 ## Getting Started
 
 There are just a few steps needed to get started. 
-* Make sure all dependencies are installed
+* Make sure all dependencies are installed (see next section)
 * Set your paths in the .bashrc (or .bash_profile)
 * Edit the parameter file to 
 	* contain paths and map/catalog names
