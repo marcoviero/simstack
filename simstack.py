@@ -29,7 +29,7 @@ k = 1.38064852e-23 #m2 kg s-2 K-1 8.617e-5 #eV/K
 class PickledStacksReader:
 	'''A class to read and organize the output of simstack.  Point it to the location of
 	the output directory and name of parameter file, and it will determine if it's
-	reading stacks or bootstraps, and organizes the outputs into N-dimensional arrays.  
+	reading stacks or bootstraps, and organizes the outputs into N-dimensional arrays.
 	'''
 
 	def __init__(self, config_path, config_file, ndecimal=2, cosmo=cosmo, area_deg=1.62):
@@ -89,10 +89,12 @@ class PickledStacksReader:
 		#if (config_file): config_file = shortname_boots + '.cfg'
 
 		if self.params['bootstrap'] == True:
+			print('creating bootstrap array w/ size '+str(self.nw)+'bands; '+str(self.nz)+'redshifts; '+str(self.nm)+'masses; '+str(self.npops)+'populations; '+str(self.npops)+' bootstraps')
 			bootstrap_fluxes = np.zeros([self.nw,self.nz,self.nm,self.npops,self.nboots])
 			bootstrap_errors = np.zeros([self.nw,self.nz,self.nm,self.npops,self.nboots])
 			bootstrap_intensities = np.zeros([self.nw,self.nz,self.nm,self.npops,self.nboots])
 		else:
+			print('creating simstack array w/ size '+str(self.nw)+'bands; '+str(self.nz)+'redshifts; '+str(self.nm)+'masses; '+str(self.npops)+'populations')
 			stacked_fluxes = np.zeros([self.nw,self.nz,self.nm,self.npops])
 			stacked_errors = np.zeros([self.nw,self.nz,self.nm,self.npops])
 			stacked_intensities = np.zeros([self.nw,self.nz,self.nm,self.npops])

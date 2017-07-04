@@ -12,14 +12,15 @@ from astropy.cosmology import Planck15 as cosmo
 from astropy.cosmology import Planck15, z_at_value
 
 class Field_catalogs:
-	def __init__(self, tbl, zkey='z_peak', mkey='lmass', rkey='ra', dkey='dec'):
+	def __init__(self, tbl, zkey='z_peak', mkey='lmass', rkey='ra', dkey='dec', uvkey='rf_U_V', vjkey='rf_V_J'):
 		self.table = tbl
 		self.nsrc = len(tbl)
-		self.zkey = zkey#.lower()
-		self.mkey = mkey#.lower()
-		self.rkey = rkey#.lower()
-		self.dkey = dkey#.lower()
-		#pdb.set_trace()
+		self.zkey = zkey
+		self.mkey = mkey
+		self.rkey = rkey
+		self.dkey = dkey
+		self.uvkey = uvkey
+		self.vjkey = vjkey
 
 	def separate_pops_by_index(self, cuts_dict, uvj = True):
 		'''
@@ -73,11 +74,11 @@ class Field_catalogs:
 						continue
 			# If no condition yet met then see if it's Quiescent
 			if (sfg[i] == 1) & (uvj == True):
-					if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+					if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 						if (self.table[self.zkey][i] < 1):
-							if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+							if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 						if (self.table[self.zkey][i] > 1):
-							if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+							if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 
 		self.table['sfg'] = sfg
 
@@ -138,11 +139,11 @@ class Field_catalogs:
 						continue
 			# If no condition yet met then see if it's Quiescent
 			if (sfg[i] == 1) & (uvj == True):
-					if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+					if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 						if (self.table[self.zkey][i] < 1):
-							if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+							if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 						if (self.table[self.zkey][i] > 1):
-							if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+							if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 
 		self.table['sfg'] = sfg
 
@@ -150,11 +151,11 @@ class Field_catalogs:
 		sfg = np.ones(self.nsrc)
 		#pdb.set_trace()
 		for i in range(self.nsrc):
-			if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+			if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 				if (self.table[self.zkey][i] < 1):
-					if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+					if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 				if (self.table[self.zkey][i] > 1):
-					if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+					if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 		#indsf = np.where(sfg == 1)
 		#indqt = np.where(sfg == 0)
 		self.table['sfg'] = sfg
@@ -170,11 +171,11 @@ class Field_catalogs:
 			if (self.table.F_ratio[i] >= Fcut):
 				sfg[i]=2
 			else:
-				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+				if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 					if (self.table[self.zkey][i] < 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 					if (self.table[self.zkey][i] > 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 		#indsf = np.where(sfg == 1)
 		#indqt = np.where(sfg == 0)
 		self.table['sfg'] = sfg
@@ -187,11 +188,11 @@ class Field_catalogs:
 			if (self.table.F_ratio[i] >= Fcut) & (self.table.a_hat_AGN[i] >= Ahat):
 				sfg[i]=2
 			else:
-				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+				if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 					if (self.table[self.zkey][i] < 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 					if (self.table[self.zkey][i] > 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 		#indsf = np.where(sfg == 1)
 		#indqt = np.where(sfg == 0)
 		self.table['sfg'] = sfg
@@ -201,11 +202,11 @@ class Field_catalogs:
 		sfg = np.ones(self.nsrc)
 		ncolor= len(uvj_nodes)-1 + 1 #+1 is qt
 		for i in range(self.nsrc):
-			if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+			if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 				if (self.table[self.zkey][i] < 1):
-					if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=ncolor-1
+					if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=ncolor-1
 				if (self.table[self.zkey][i] > 1):
-					if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=ncolor-1
+					if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=ncolor-1
 			if sfg[i] < ncolor-1:
 				for j in range(ncolor-1):
 					if ((self.table.UVJ.values[i]) >= uvj_nodes[j]) & ((self.table.UVJ.values[i]) < uvj_nodes[j+1]): sfg[i]=j
@@ -225,11 +226,11 @@ class Field_catalogs:
 			elif (self.table.F_ratio[i] >= Fcut):
 				sfg[i]=2 #AGN
 			else:
-				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+				if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 					if (self.table[self.zkey][i] < 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 					if (self.table[self.zkey][i] > 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
 	def separate_5pops(self, Fcut = 25, MIPS24_cut = 200.0):
@@ -245,11 +246,11 @@ class Field_catalogs:
 			elif (self.table.F_ratio.values[i] >= Fcut):
 				sfg[i]=2
 			else:
-				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+				if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 					if (self.table[self.zkey][i] < 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 					if (self.table[self.zkey][i] > 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
 	def separate_5popsB(self, Fcut = 50, ssfr = 30):
@@ -264,11 +265,11 @@ class Field_catalogs:
 			elif (self.table.F_ratio.values[i] >= Fcut):
 				sfg[i]=2
 			else:
-				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+				if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 					if (self.table[self.zkey][i] < 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 					if (self.table[self.zkey][i] > 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
 	def separate_4pops(self, Fcut = 40, age_cut = 7.5):
@@ -279,11 +280,11 @@ class Field_catalogs:
 			elif (self.table.F_ratio.values[i] >= Fcut):
 				sfg[i]=2
 			else:
-				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+				if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 					if (self.table[self.zkey][i] < 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 					if (self.table[self.zkey][i] > 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
 	def separate_3pops(self,  Fcut = 40):
@@ -292,11 +293,11 @@ class Field_catalogs:
 			if (self.table.F_ratio.values[i] >= Fcut):
 				sfg[i]=2
 			else:
-				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+				if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 					if (self.table[self.zkey][i] < 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 					if (self.table[self.zkey][i] > 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
 	def separate_3pops_sb(self,  age_cut = 7.4):
@@ -305,11 +306,11 @@ class Field_catalogs:
 			if (self.table.lage.values[i] <= age_cut):
 				sfg[i]=2
 			else:
-				if (self.table.rf_U_V.values[i] > 1.3) and (self.table.rf_V_J.values[i] < 1.5):
+				if (self.table[self.uvkey][i] > 1.3) and (self.table[self.vjkey][i] < 1.5):
 					if (self.table[self.zkey][i] < 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.69) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 					if (self.table[self.zkey][i] > 1):
-						if (self.table.rf_U_V.values[i] > (self.table.rf_V_J.values[i]*0.88+0.59) ): sfg[i]=0
+						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
 		self.table['sfg'] = sfg
 
 	def get_subpop_ids(self, znodes, mnodes, pop_dict, linear_mass=1, lookback_time = False):
