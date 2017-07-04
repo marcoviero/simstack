@@ -12,10 +12,7 @@ import parameters
 from utils import circle_mask
 from utils import clean_args
 from utils import clean_nans
-from utils import dist_idl
 from utils import gauss_kern
-from utils import pad_and_smooth_psf
-from utils import shift_twod
 from utils import smooth_psf
 from lmfit import Parameters, minimize, fit_report
 pi=3.141592653589793
@@ -30,6 +27,10 @@ h = 6.62607004e-34 #m2 kg / s  #4.13e-15 #eV/s
 k = 1.38064852e-23 #m2 kg s-2 K-1 8.617e-5 #eV/K
 
 class PickledStacksReader:
+	'''A class to read and organize the output of simstack.  Point it to the location of
+	the output directory and name of parameter file, and it will determine if it's
+	reading stacks or bootstraps, and organizes the outputs into N-dimensional arrays.  
+	'''
 
 	def __init__(self, config_path, config_file, ndecimal=2, cosmo=cosmo, area_deg=1.62):
 		''' Uses the config_file to determine if it is bootstraps or not'''
@@ -67,12 +68,6 @@ class PickledStacksReader:
 		z_m_keys = self.m_z_key_builder(ndecimal=self.ndec)
 		self.z_keys = z_m_keys[0]
 		self.m_keys = z_m_keys[1]
-		#self.slice_keys = self.slice_key_builder(ndecimal=2)
-		#self.stack_keys = self.stack_key_builder()
-		#self.bootstrap_flux_array = np.array()
-		#self.bootstrap_error_array = {}
-		#self.bootstrap_error_dict = {}
-		#self.binsize_error_array  = {}
 		self.bin_ids = {}
 		self.read_pickles()
 		if self.params['bootstrap'] == True:
