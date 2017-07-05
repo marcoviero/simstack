@@ -8,6 +8,7 @@ The python version of the code is *object oriented*, with map objects (containin
 
 For those familiar with the IDL version, and insist on continuing to use that implimentation of the algorithm, *viero_quick_stack* is a similar wrapper to the *stack_in_redshift_slices* function.  Note, previous iPython notebooks using this version were accidentally scrubbed during a reordering of the github.  If needed I can go through backups, just ask.  
 
+
 ## Getting Started
 
 There are just a few steps needed to get started: 
@@ -78,11 +79,13 @@ Hopefully, with community input (which I encourage!) the code will grow in utili
 
 ## People
 
-* Marco Viero
-* Lorenzo Moncelsi
+* Marco Viero (KIPAC/Stanford)
+* Lorenzo Moncelsi (Caltech)
+* Jason Sun (Caltech)
+* Dongwoo Chung (KIPAC/Stanford)
 
 ## License, Credits etc
 
-This is work in progress! If you use any of the code or ideas here in your research, please cite us as (Viero et al. in preparation).
+This is work in progress! If you use any of the code or ideas here in your research, please cite us as (Viero et al. 2013).
 
 All content Copyright 2015 the authors. The code is available for use under the MIT license.
