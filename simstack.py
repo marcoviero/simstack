@@ -265,7 +265,7 @@ def simultaneous_stack_array_oned(p, layers_1d, data1d, err1d = None, arg_order 
   # Take the mean of the layers after they've been summed together
   model -= np.mean(model)
 
-  if err1d is None:
+  if err1d == None:
     return (data1d - model)
   return (data1d - model)/err1d
 
