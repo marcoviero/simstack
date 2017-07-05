@@ -33,7 +33,8 @@ class PickledStacksReader:
 	'''
 
 	def __init__(self, config_path, config_file, ndecimal=2, cosmo=cosmo, area_deg=1.62):
-		''' Uses the config_file to determine if it is bootstraps or not'''
+		''' Uses the config_file to determine if reading in bootstraps or not.
+		'''
 
 		self.path = config_path
 		self.config_file = config_file
@@ -86,7 +87,6 @@ class PickledStacksReader:
 		return params
 
 	def read_pickles(self):
-		#if (config_file): config_file = shortname_boots + '.cfg'
 
 		if self.params['bootstrap'] == True:
 			print('creating bootstrap array w/ size '+str(self.nw)+'bands; '+str(self.nz)+'redshifts; '+str(self.nm)+'masses; '+str(self.npops)+'populations; '+str(self.npops)+' bootstraps')
@@ -220,6 +220,10 @@ class PickledStacksReader:
 		return [z_suf, m_suf]
 
 def measure_cib(stacked_object, area_deg=1.62, tcib=False):
+	'''
+	Sums the contribution from sources (in each bin) to the CIB at each wavelength.
+	If tcib == True, output is sum of all bins at each wavelength.
+	'''
 	if area_deg == 1.62:
 		print 'defaulting to uVista/COSMOS area of 1.62deg2'
 	area_sr = area_deg * (3.1415926535 / 180.)**2
@@ -279,11 +283,8 @@ def stack_in_redshift_slices(
   ''' The first iteration of the translation from IDL to Python.
       Looks like an IDL function.
       Suggest using wrappers like viero_quick_stack.py
-      but highly recommend Pythonic: stack_libraries_in_redshift_slices
+      but highly recommend Pythonic: stack_libraries_in_layers
       function that can be found below.
-
-      Inputs:
-
   '''
 
   w = WCS(hd)
