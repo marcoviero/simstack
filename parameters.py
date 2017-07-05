@@ -107,6 +107,12 @@ def get_general_params(raw_params):
         params['uv_key'] = 'rf_U_V'
         params['vj_key'] = 'rf_V_J'
 
+    # Have a floating background level instead of removing mean
+    try:
+        params['float_background'] = raw_params['float_background']
+    except:
+        params['float_background'] = False
+
     #pdb.set_trace()
     # Type of galaxy split.  Default is UVJ star-forming / quiescent
     try:

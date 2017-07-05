@@ -265,7 +265,7 @@ def simultaneous_stack_array_oned(p, layers_1d, data1d, err1d = None, arg_order 
   # Take the mean of the layers after they've been summed together
   model -= np.mean(model)
 
-  if err1d == None:
+  if err1d is None:
     return (data1d - model)
   return (data1d - model)/err1d
 
@@ -492,6 +492,7 @@ def stack_libraries_in_layers_w_background(
   subcatalog_library,
   quiet=None):
 
+  print 'stacking with floating background'
   map_names = [i for i in map_library.keys()]
   # All wavelengths in cwavelengths
   cwavelengths = [map_library[i].wavelength for i in map_names]
@@ -502,8 +503,6 @@ def stack_libraries_in_layers_w_background(
 
   lists = subcatalog_library.keys()
   nlists = len(lists)
-  #stacked_sed=np.zeros([nwv, nlists])
-  #stacked_sed_err=np.zeros([nwv,nlists])
   stacked_layers = {}
 
   cwavelengths = []

@@ -26,6 +26,7 @@ from utils import shift_twod
 from utils import smooth_psf
 from lmfit import Parameters, minimize, fit_report
 from simstack import stack_libraries_in_layers
+from simstack import stack_libraries_in_layers_w_background
 from simstack import is_true
 from bootstrap import Bootstrap
 
@@ -101,7 +102,10 @@ def main():
                 out_file_suffix = '_'+stacked_flux_density_key
 
             # Do simultaneous stacking
-            stacked_flux_densities = stack_libraries_in_layers(sky_library,binned_ra_dec)
+            if params['float_background'] == True:
+                stacked_flux_densities = stack_libraries_in_layers_w_background(sky_library,binned_ra_dec)
+            else:
+                stacked_flux_densities = stack_libraries_in_layers(sky_library,binned_ra_dec)
 
             save_stacked_fluxes(stacked_flux_densities,params, out_file_path,out_file_suffix, IDs=bin_ids)
         #pdb.set_trace()
