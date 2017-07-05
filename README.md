@@ -2,10 +2,11 @@
 An open-source, user-friendly, Python version of SIMSTACK.  
 
 **As of *1/28/2017* SIMSTACK  got easier to use!** After setting local paths in your .bashrc (or .bash_profile), edit the parameter file (**use example.cfg as a guide**) to define your maps, catalogs, and pickled outputs (examples below), as well as to choose the binning and method of stacking,  and run from the command line with: 
-../run_simstack_cmd_line.py example.cfg
+`../run_simstack_cmd_line.py example.cfg`
 
-For those familiar with the IDL version (and insist on continuing to use that implimentation of the algorithm) *viero_quick_stack* is a similar wrapper to the *stack_in_redshift_slices* function.  
-The python version of the code is intended to be object oriented, with map objects (containing maps, noisemaps, beams, color corrections, etc.) and catalog objects (with RA/DEC lists for different selection criteria) collected into libraries, and SIMSTACK performed from *the command line*, or from a script containing one line of code.  
+The python version of the code is *object oriented*, with map objects (containing maps, noisemaps, beams, color corrections, etc.) and catalog objects (with RA/DEC lists for different selection criteria) collected into dictionaries. 
+
+For those familiar with the IDL version, and insist on continuing to use that implimentation of the algorithm, *viero_quick_stack* is a similar wrapper to the *stack_in_redshift_slices* function.  Note, previous iPython notebooks using this version were accidentally scrubbed during a reordering of the github.  If needed I can go through backups, just ask.  
 
 ## Getting Started
 
