@@ -9,12 +9,12 @@ The python version of the code is intended to be object oriented, with map objec
 
 ## Getting Started
 
-There are just a few steps needed to get started. 
+There are just a few steps needed to get started: 
 * Make sure all dependencies are installed (see next section)
 * Set your paths in the .bashrc (or .bash_profile)
-* Edit the parameter file to 
-	* contain paths and map/catalog names
-	* desired binning
+* Edit the parameter file to specify
+	* paths and names of maps/catalog
+	* desired binning: style and nodes
 	* whether to stack in redshift bins, or all at once
 	* map specific details like 
 		* color corrections 
@@ -42,19 +42,20 @@ In your .bashrc define the following, with edits to define your prefered directo
 	export PICKLESPATH=$PICKLESPATH/data/pickles/
 
 ## Setting up the Parameter file to run simstack from command line 
-It's pretty self explainatory (follow example.cfg); the only tricky part is defining [populations], which sets the the galaxy splitting scheme (and still needs work...)
+It's pretty self explainatory (follow example.cfg); the only tricky part is defining the section titled [populations], which sets the the galaxy splitting scheme (and still needs work...)
 The two recommended options (for now) are:
 * sf-qt
 	* Splits the sample into star-forming and quiescent according to the Williams UVJ definition.  Requires rest-frame U-J and V-J colors, labeled rf_U_V and rf_V_J, respectively.   
 * general
 	* Populations are defined by obeying __one__ condition (for now, ultimately would like no limit on conditions). To ignore condition set it to False.  
 	Each line defines one population, and takes the form
-		* population_key = population_index condition_key greater_that less_than equal_to
-		For example: 
+		* population_key = population_index condition_key greater_than less_than equal_to
+		Ignore conditions by setting them to be False.  
+        For example: 
 			+ sf = 1 CLASS False False 1
-		the population 'sf' will be labeled 1 in the sfg column of the catalog, and is defined as objects with CLASS = 1 
-        	+ sb = 2 lssfr -8.0 False
-        	the population 'sb' will be labeled 2 in the sfg column of the catalog, and is defined as objects whose lssfr < -8.0 
+		the population 'sf' is given the label 1 in the sfg column of the catalog, and are defined as catalog objects whose CLASS == 1 
+        	+ sb = 2 lssfr -8.0 False False
+        	the population 'sb' is given the label 2 in the sfg column of the catalog, and are defined as objects whose lssfr < -8.0 
 
 	Conditions are set in reverse order, so if, say, a galaxy obeys the conditions of both sf and agn, but agn = 3 and sf = 1, then it will be defined as agn. 
 
