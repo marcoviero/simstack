@@ -156,8 +156,6 @@ class Field_catalogs:
 					if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 				if (self.table[self.zkey][i] > 1):
 					if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
-		#indsf = np.where(sfg == 1)
-		#indqt = np.where(sfg == 0)
 		self.table['sfg'] = sfg
 
 	def separate_additional_feature(self, feature_name):
@@ -176,8 +174,6 @@ class Field_catalogs:
 						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 					if (self.table[self.zkey][i] > 1):
 						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
-		#indsf = np.where(sfg == 1)
-		#indqt = np.where(sfg == 0)
 		self.table['sfg'] = sfg
 
 	def separate_sf_qt_agn_Ahat(self,Fcut = 20, Ahat = 0.5):
@@ -193,8 +189,6 @@ class Field_catalogs:
 						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.69) ): sfg[i]=0
 					if (self.table[self.zkey][i] > 1):
 						if (self.table[self.uvkey][i] > (self.table[self.vjkey][i]*0.88+0.59) ): sfg[i]=0
-		#indsf = np.where(sfg == 1)
-		#indqt = np.where(sfg == 0)
 		self.table['sfg'] = sfg
 	#def separate_nuv_r(self):
 
@@ -330,7 +324,6 @@ class Field_catalogs:
 							(self.table[self.mkey] >= np.min(mnodes[jm:jm+2])) & (self.table[self.mkey] < np.max(mnodes[jm:jm+2])) )
 
 					self.subpop_ids['z_'+clean_args(str('{:.2f}'.format(znodes[iz])))+'_'+clean_args(str('{:.2f}'.format(znodes[iz+1])))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_'+k] = self.table.ID[ind_mz].values
-					#self.subpop_ids['z_'+clean_args('{:.3f}'.format(znodes[iz]))+'_'+clean_args('{:.3f}'.format(znodes[iz+1]))+'__m_'+clean_args(str('{:.2f}'.format(mnodes[jm])))+'_'+clean_args(str('{:.2f}'.format(mnodes[jm+1])))+'_'+k] = self.table.ID[ind_mz].values
 
 	def get_sf_qt_mass_redshift_bins(self, znodes, mnodes):
 		self.id_z_ms = {}
@@ -603,17 +596,11 @@ class Field_catalogs:
 	def subset_positions(self,radec_ids):
 		''' This positions function is very general.
 			User supplies IDs dictionary, function returns RA/DEC dictionaries with the same keys'''
-		#self.ra_dec = {}
 		ra_dec = {}
-		#ra = {}
-		#dec = {}
-		#pdb.set_trace()
 		for k in radec_ids.keys():
 			ra0  = self.table[self.rkey]
 			dec0 = self.table[self.dkey]
 			ra  = ra0[self.table.ID.isin(radec_ids[k])].values
 			dec = dec0[self.table.ID.isin(radec_ids[k])].values
-			#ra  = self.table.ra[self.table.ID.isin(radec_ids[k])].values
-			#dec = self.table.dec[self.table.ID.isin(radec_ids[k])].values
 			ra_dec[k] = [ra,dec]
 		return ra_dec
