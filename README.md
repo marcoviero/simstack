@@ -73,7 +73,7 @@ For the moment, [an iPython Notebook](https://github.com/marcoviero/simstack/tre
 
 Future projects include adding priors from SIMSTACK, and moving from a least-squares solution to marginalized probabilities using a full MCMC.
 
-SEDSTACK is an attempt to fit entire SEDs to the full set of maps --- rather than fitting for flux densities one wavelength at a time --- in order to dig still deeper into the confusion-dominated data.  Outstanding issues are dealing with systematic offsets, covariance between maps, careful consideration of beam and pixel size differences and how the affect the chi-squared, and using actual beams instead of Gaussian approximations.  
+SEDSTACK is an attempt to fit entire SEDs to the full set of maps -- rather than fitting for flux densities one wavelength at a time -- in order to dig still deeper into the confusion-dominated data.  Outstanding issues are dealing with systematic offsets, covariance between maps, careful consideration of beam and pixel size differences and how the affect the chi-squared, and using actual beams instead of Gaussian approximations.  
 
 Hopefully, with community input (which I encourage!) the code will grow in utility.
 
@@ -86,6 +86,6 @@ Hopefully, with community input (which I encourage!) the code will grow in utili
 
 ## License, Credits etc
 
-This is work in progress! If you use any of the code or ideas here in your research, please cite us as (Viero et al. 2013).
+This is work in progress! If you use any of the code or ideas here in your research, please cite us as Viero et al. (2013b).
 
 All content Copyright 2015 the authors. The code is available for use under the MIT license.
