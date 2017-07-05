@@ -42,8 +42,7 @@ In your .bashrc define the following, with edits to define your prefered directo
 	export PICKLESPATH=$PICKLESPATH/data/pickles/
 
 ## Setting up the Parameter file to run simstack from command line 
-To-be-completed (but it's pretty self explainatory, follow example.cfg)
-The only tricky part is defining [populations], which sets the the galaxy splitting scheme (and still needs work...)
+It's pretty self explainatory (follow example.cfg); the only tricky part is defining [populations], which sets the the galaxy splitting scheme (and still needs work...)
 The two recommended options (for now) are:
 * sf-qt
 	* Splits the sample into star-forming and quiescent according to the Williams UVJ definition.  Requires rest-frame U-J and V-J colors, labeled rf_U_V and rf_V_J, respectively.   
@@ -60,9 +59,9 @@ The two recommended options (for now) are:
 	Conditions are set in reverse order, so if, say, a galaxy obeys the conditions of both sf and agn, but agn = 3 and sf = 1, then it will be defined as agn. 
 
 
-## Code Outputs
-Objects!  Tools to read and interpret those objects are under constant developement and improving all the time.  
-[An iPython Notebook](https://github.com/marcoviero/simstack/tree/master/notebooks) is provided as an example of how to use the following functions:
+## Code Output
+The command-line simstack routine writes pickled objects to custom-named folders.  Tools to read pickles and interpret the objects are under constant developement and improving all the time.  
+For the moment, [an iPython Notebook](https://github.com/marcoviero/simstack/tree/master/notebooks) is provided as an example of how to use the following functions:
 * from simstack import PickledStacksReader
 	* the workhorse.  Uses the info stored in the configuration file (which is rewritten to the output directory) to read in the stacks, determines if they are bootstraps, and if they are then calculates the uncertainties.  
 * from simstack import measure_cib
