@@ -69,6 +69,11 @@ For the moment, [an iPython Notebook](https://github.com/marcoviero/simstack/tre
 	* the workhorse.  Uses the info stored in the configuration file (which is rewritten to the output directory) to read in the stacks, determines if they are bootstraps, and if they are then calculates the uncertainties.  
 * from simstack import measure_cib
 
+## Example
+The configuration file **example.cfg** is provided to test simstack.  Also needed are maps and catalogs: those called by configuration file can be downloaded from:
+- maps -- 
+- catalogs -- 
+
 ## Future Work
 
 Future projects include adding priors from SIMSTACK, and moving from a least-squares solution to marginalized probabilities using a full MCMC.
