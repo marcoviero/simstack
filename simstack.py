@@ -89,7 +89,7 @@ class PickledStacksReader:
 	def read_pickles(self):
 
 		if self.params['bootstrap'] == True:
-			print('creating bootstrap array w/ size '+str(self.nw)+'bands; '+str(self.nz)+'redshifts; '+str(self.nm)+'masses; '+str(self.npops)+'populations; '+str(self.npops)+' bootstraps')
+			print('creating bootstrap array w/ size '+str(self.nw)+'bands; '+str(self.nz)+'redshifts; '+str(self.nm)+'masses; '+str(self.npops)+'populations; '+str(self.nboots)+' bootstraps')
 			bootstrap_fluxes = np.zeros([self.nw,self.nz,self.nm,self.npops,self.nboots])
 			bootstrap_errors = np.zeros([self.nw,self.nz,self.nm,self.npops,self.nboots])
 			bootstrap_intensities = np.zeros([self.nw,self.nz,self.nm,self.npops,self.nboots])
@@ -173,11 +173,17 @@ class PickledStacksReader:
 								key = clean_args(z_suf+'__'+ m_suf+ '_' + p_suf)
 								try:
 									stacked_fluxes[wv,i,j,p] = single_wv_stacks[key].value
-									stacked_errors[wv,i,j,p] = single_wv_stacks[key].stderr
+									try:
+										stacked_errors[wv,i,j,p] = single_wv_stacks[key].psnerr
+									except:
+										stacked_errors[wv,i,j,p] = single_wv_stacks[key].stderr
 									stacked_intensities[wv,i,j,p] = single_wv_stacks[key].value * (self.fqs[wv]*1e9) * 1e-26 * 1e9
 								except:
 									stacked_fluxes[wv,i,j,p] = single_wv_stacks[key]['value']
-									stacked_errors[wv,i,j,p] = single_wv_stacks[key]['stderr']
+									try:
+										stacked_errors[wv,i,j,p] = single_wv_stacks[key]['psnerr']
+									except:
+										stacked_errors[wv,i,j,p] = single_wv_stacks[key]['stderr']
 									stacked_intensities[wv,i,j,p] = single_wv_stacks[key]['value'] * (self.fqs[wv]*1e9) * 1e-26 * 1e9
 
 				self.simstack_flux_array = stacked_fluxes
@@ -392,6 +398,7 @@ def stack_libraries_in_layers(
   #stacked_sed=np.zeros([nwv, nlists])
   #stacked_sed_err=np.zeros([nwv,nlists])
   stacked_layers = {}
+  signal_to_noise = {}
 
   cwavelengths = []
   radius = 1.1
@@ -401,6 +408,7 @@ def stack_libraries_in_layers(
     cmap = map_library[map_library.keys()[iwv]].map
     cnoise = map_library[map_library.keys()[iwv]].noise
     cwv = map_library[map_library.keys()[iwv]].wavelength
+    crms = map_library[map_library.keys()[iwv]].rms
     cname = map_library.keys()[iwv]
     cwavelengths.append(cwv)
     chd = map_library[map_library.keys()[iwv]].header
@@ -417,6 +425,7 @@ def stack_libraries_in_layers(
 
     # STEP 1  - Make Layers Cube at each wavelength
     layers=np.zeros([nlists,cms[0],cms[1]])
+    ngals_layer = {}
 
     for k in range(nlists):
       s = lists[k]
@@ -431,6 +440,7 @@ def stack_libraries_in_layers(
         # CHECK FOR SOURCES THAT FALL ON ZEROS
         ind_nz=np.where(cmap[real_x,real_y] != 0 )
         nt = np.shape(ind_nz)[1]
+        ngals_layer[s] = nt
         #print 'ngals: ' + str(nt)
         if nt > 0:
           real_x = real_x[ind_nz]
@@ -438,6 +448,7 @@ def stack_libraries_in_layers(
 
           for ni in range(nt):
             layers[k, real_x[ni],real_y[ni]]+=1.0
+      else: ngals_layer[s] = 1
 
     # STEP 2  - Convolve Layers and put in pixels
     flattened_pixmap = np.sum(layers,axis=0)
@@ -474,15 +485,16 @@ def stack_libraries_in_layers(
       arg = clean_args(lists[iarg])
       fit_params.add(arg,value= 1e-3*np.random.randn())
 
-
     if len(ierr)==0: pdb.set_trace()
     cov_ss_1d = minimize(simultaneous_stack_array_oned, fit_params,
       args=(cfits_flat,), kws={'data1d':imap,'err1d':ierr}, nan_policy = 'propagate')
     del cfits_flat, imap, ierr
 
     #Dictionary keys decided here.  Was originally wavelengths.  Changing it back to map_names
-    packed_fluxes = pack_fluxes(cov_ss_1d.params)
-    stacked_layers[cname] = packed_fluxes
+    #packed_fluxes = pack_fluxes(cov_ss_1d.params)
+    packed_stn = pack_simple_poisson_errors(cov_ss_1d.params,ngals_layer,crms)
+    #pdb.set_trace()
+    stacked_layers[cname] = packed_stn # packed_fluxes
 
   gc.collect
   return stacked_layers
@@ -529,6 +541,7 @@ def stack_libraries_in_layers_w_background(
 
     # STEP 1  - Make Layers Cube at each wavelength
     layers=np.zeros([nlists+1,cms[0],cms[1]])
+    ngals_layer = {}
 
     for k in range(nlists):
       s = lists[k]
@@ -543,6 +556,7 @@ def stack_libraries_in_layers_w_background(
         # CHECK FOR SOURCES THAT FALL ON ZEROS
         ind_nz=np.where(cmap[real_x,real_y] != 0 )
         nt = np.shape(ind_nz)[1]
+        ngals_layer[s] = nt
         #print 'ngals: ' + str(nt)
         if nt > 0:
           real_x = real_x[ind_nz]
@@ -550,6 +564,7 @@ def stack_libraries_in_layers_w_background(
 
           for ni in range(nt):
             layers[k, real_x[ni],real_y[ni]]+=1.0
+      else: ngals_layer[s] = 1
 
     # STEP 2  - Convolve Layers and put in pixels
     flattened_pixmap = np.sum(layers,axis=0)
@@ -586,7 +601,8 @@ def stack_libraries_in_layers_w_background(
 
     #Dictionary keys decided here.  Was originally wavelengths.  Changing it back to map_names
     packed_fluxes = pack_fluxes(cov_ss_1d.params)
-    stacked_layers[cname] = packed_fluxes
+    packed_stn = pack_simple_poisson_errors(cov_ss_1d.params,ngals_layer,crms)
+    stacked_layers[cname] = packed_stn # packed_fluxes
 
   gc.collect
   return stacked_layers
@@ -594,11 +610,23 @@ def stack_libraries_in_layers_w_background(
 def pack_fluxes(input_params):
 	packed_fluxes = {}
 	for iparam in input_params:
-		packed_fluxes[iparam]={}
+		packed_fluxes[iparam] = {}
 		packed_fluxes[iparam]['value'] = input_params[iparam].value
 		packed_fluxes[iparam]['stderr'] = input_params[iparam].stderr
 
 	return packed_fluxes
+
+def pack_simple_poisson_errors(input_params, ngals, map_rms):
+	packed_stn = {}
+	for iparam in input_params:
+		packed_stn[iparam] = {}
+		packed_stn[iparam]['value'] = input_params[iparam].value
+		packed_stn[iparam]['stderr'] = input_params[iparam].stderr
+		packed_stn[iparam]['ngals_bin'] = ngals[iparam]
+		packed_stn[iparam]['psnerr'] = map_rms / np.sqrt(float(ngals[iparam]))
+
+	#pdb.set_trace()
+	return packed_stn
 
 def is_true(raw_params, key):
     """Is raw_params[key] true? Returns boolean value.
