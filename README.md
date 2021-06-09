@@ -70,9 +70,9 @@ For the moment, [an iPython Notebook](https://github.com/marcoviero/simstack/tre
 * from simstack import measure_cib
 
 ## Example
-The configuration file **example.cfg** is provided to test simstack. Example maps and catalog called by the configuration file can be downloaded from http://www.astro.caltech.edu/viero/simstack/cosmos/
-- [maps -- *.cutout.fits](http://www.astro.caltech.edu/viero/simstack/cosmos/)
-- [catalog -- COSMOS2015_Laigle+_Simplified_v1.1.csv](http://www.astro.caltech.edu/viero/simstack/cosmos/)
+The configuration file **example.cfg** is provided to test simstack. Example maps and catalog called by the configuration file can be downloaded from http://sites.astro.caltech.edu/viero/simstack/cosmos/
+- [maps -- *.cutout.fits](http://sites.astro.caltech.edu/viero/simstack/cosmos/)
+- [catalog -- COSMOS2015_Laigle+_Simplified_v1.1.csv](http://sites.astro.caltech.edu/viero/simstack/cosmos/)
 
 To run, comfirm that the maps and catalog are in the right directories, and simply call: 
 `./run_simstack_cmd_line.py example.cfg`
