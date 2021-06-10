@@ -1,6 +1,6 @@
 import pdb
 import numpy as np
-import ConfigParser
+from configparser import ConfigParser
 import os
 import logging
 import pprint
@@ -272,7 +272,7 @@ def get_population_parameters(raw_pop_params, params):
 
     if params['galaxy_splitting_scheme'] == 'general':
         for pop in raw_pop_params:
-            print pop
+            print(pop)
             tst = [int(raw_pop_params[pop][0])]
             if len(raw_pop_params[pop].split()) > 1:
                 tst.append([k for k in raw_pop_params[pop][1:].split()])
@@ -280,14 +280,14 @@ def get_population_parameters(raw_pop_params, params):
                     try:
                         bl = string_is_true(tst[1][k])
                         tst[1][k] = bl
-                        #print 'is a boolean'
+                        #print('is a boolean')
                     except NameError:
                         try:
                             float(tst[1][1])
                             tst[1][k]=float(tst[1][k])
-                            #print 'is a float'
+                            #print('is a float')
                         except ValueError:
-                            #print 'do nothin'
+                            #print('do nothin')
                             pass
             else:
                 tst.append([])

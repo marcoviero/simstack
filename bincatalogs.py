@@ -108,7 +108,7 @@ class Field_catalogs:
 		else:
 			Ncrit = npop
 			uvj = False
-		print Ncrit
+		print (Ncrit)
 		#Set (descending) order of cuts.
 		#names      = [k for k in cuts_dict][::-1]
 		#reverse_ind here is the arguments indices in reversed order
